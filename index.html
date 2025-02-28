@@ -111,12 +111,14 @@
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = false;
         controls.dampingFactor = 0.05;
-        controls.minDistance = 2;
-        controls.maxDistance = 20;
+        controls.minDistance = 10;
+        controls.maxDistance = 5;
         controls.enableZoom = true;
         controls.zoomSpeed = 1.0;
         controls.minPolarAngle = 0;          // Allow full rotation (0 degrees)
         controls.maxPolarAngle = 2 * Math.PI; // Allow full rotation (360 degrees)
+        controls.target.set(0, 0, 0);
+        controls.update();
 
         function resizeRenderer() {
             const totalWidth = wrapper.clientWidth;
