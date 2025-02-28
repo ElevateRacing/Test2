@@ -61,6 +61,10 @@
         renderer.autoClear = true;
         container.appendChild(renderer.domElement);
 
+        // Add coordinate axes
+        const axesHelper = new THREE.AxesHelper(1); // Size of 1 unit
+        scene.add(axesHelper);
+        
         // Add lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
         scene.add(ambientLight);
