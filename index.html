@@ -40,8 +40,8 @@
         <div id="bottom-text">*Disclaimer - we know its the coolest kart</div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fflate@0.7.4/umd/index.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/3MFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/OBJLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/MTLLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/controls/TrackballControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/RGBELoader.js"></script>
     <script>
@@ -133,48 +133,76 @@
         pointLight.position.set(0, 5, 5);
         scene.add(pointLight);
 */
-        // Load the Mono.3mf model
-        const loader = new THREE.ThreeMFLoader();
-        loader.load(
-            'Mono.3mf', // Path to your .3mf file
-            function (object) {
-                scene.add(object);
-                object.position.set(0, 0, 0); // Center the model
-                object.scale.set(0.001, 0.001, 0.001);    // Adjust scale if needed
-                //object.rotation.z = Math.PI / 2; // Rotate 90 degrees around Z-axis
+        // Load the .mtl and .obj files
+        const mtlLoader = new THREE.MTLLoader();
+        mtlLoader.load(
+            'Mono.mtl', // Path to your .mtl file
+            function (materials) {
+                materials.preload(); // Preload the materials
 
-                console.log('Model loaded successfully!');
-                console.log('Object structure:', object);
+                const objLoader = new THREE.OBJLoader();
+                objLoader.setMaterials(materials); // Link materials to the OBJ
+                objLoader.load(
+                    'Mono.obj', // Path to your .obj file
+                    function (object) {
+                        scene.add(object);
+                        object.position.set(0, 0, 0); // Center the model
+                        object.scale.set(0.001, 0.001, 0.001); // Adjust scale if needed
 
-                // Apply PBR material, preserving original color if not black
-                let meshCount = 0;
-                object.traverse(child => {
-                    if (child.isMesh) {
-                        meshCount++;
-                        console.log('Mesh found:', child);
-                        console.log('Geometry vertices:', child.geometry.attributes.position ? child.geometry.attributes.position.count : 'none');
-                        console.log('Original material:', child.material);
+                        console.log('Model loaded successfully!');
+                        console.log('Object structure:', object);
 
-                        const originalColor = child.material.color ? child.material.color.getHex() : 0xffffff;
-                        child.material = new THREE.MeshStandardMaterial({
-                            color: originalColor === 0x000000 ? 0xcccccc : originalColor, // Light grey if black
-                            roughness: 0.3,
-                            metalness: 0.5,
-                            envMap: scene.environment,
-                            envMapIntensity: 2.0
+                        // Apply PBR material tweaks if needed
+                        let meshCount = 0;
+                        object.traverse(child => {
+                            if (child.isMesh) {
+                                meshCount++;
+                                console.log('Mesh found:', child);
+                                console.log('Geometry vertices:', child.geometry.attributes.position ? child.geometry.attributes.position.count : 'none');
+                                console.log('Original material:', child.material);
+
+                                // If material is missing or black, apply a default PBR material
+                                if (!child.material || child.material.color.getHex() === 0x000000) {
+                                    child.material = new THREE.MeshStandardMaterial({
+                                        color: 0xcccccc, // Light grey fallback
+                                        roughness: 0.3,
+                                        metalness: 0.5,
+                                        envMap: scene.environment,
+                                        envMapIntensity: 2.0
+                                    });
+                                } else {
+                                    // Enhance existing material with PBR properties
+                                    child.material.roughness = 0.3;
+                                    child.material.metalness = 0.5;
+                                    child.material.envMap = scene.environment;
+                                    child.material.envMapIntensity = 2.0;
+                                }
+                                child.material.needsUpdate = true;
+                            }
                         });
-                        child.material.needsUpdate = true;
+                        console.log('Total meshes:', meshCount);
+                        if (meshCount === 0) console.error('No meshes found in model!');
+                    },
+                    function (xhr) {
+                        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                    },
+                    function (error) {
+                        console.error('Error loading Mono.obj:', error);
                     }
-                });
-                console.log('Total meshes:', meshCount);
-                if (meshCount === 0) console.error('No meshes found in model!');
+                );
             },
             function (xhr) {
-                console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                console.log('MTL ' + (xhr.loaded / xhr.total * 100) + '% loaded');
             },
             function (error) {
-                console.error('Error loading Mono.3mf:', error);
+                console.error('Error loading Mono.mtl:', error);
+            }
+        );
 
+
+
+
+                
 
         // Position the camera
         camera.position.z = 1;
