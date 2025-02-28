@@ -44,6 +44,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/MTLLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/controls/TrackballControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/RGBELoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/geometries/DecalGeometry.js"></script>
     <script>
         // Scene, camera, and renderer setup
         const scene = new THREE.Scene();
@@ -126,45 +127,39 @@
         pointLight.position.set(0, 5, 5);
         scene.add(pointLight);
 */
-        // Load the .mtl and .obj files
+        // Load the model and add decals
+        let model; // To store the loaded OBJ for decal application
         const mtlLoader = new THREE.MTLLoader();
         mtlLoader.load(
-            'Mono.mtl', // Path to your .mtl file
+            'Mono.mtl',
             function (materials) {
-                materials.preload(); // Preload the materials
+                materials.preload();
 
                 const objLoader = new THREE.OBJLoader();
-                objLoader.setMaterials(materials); // Link materials to the OBJ
+                objLoader.setMaterials(materials);
                 objLoader.load(
-                    'Mono.obj', // Path to your .obj file
+                    'Mono.obj',
                     function (object) {
-                        scene.add(object);
-                        object.position.set(0, 0, 0); // Center the model
-                        object.scale.set(0.005, 0.005, 0.005); // Adjust scale if needed
+                        model = object; // Store the model
+                        scene.add(model);
+                        model.position.set(0, 0, 0);
+                        model.scale.set(0.001, 0.001, 0.001);
 
                         console.log('Model loaded successfully!');
-                        console.log('Object structure:', object);
+                        console.log('Object structure:', model);
 
-                        // Apply PBR material tweaks if needed
-                        let meshCount = 0;
-                        object.traverse(child => {
+                        // Apply PBR material tweaks
+                        model.traverse(child => {
                             if (child.isMesh) {
-                                meshCount++;
-                                console.log('Mesh found:', child);
-                                console.log('Geometry vertices:', child.geometry.attributes.position ? child.geometry.attributes.position.count : 'none');
-                                console.log('Original material:', child.material);
-
-                                // If material is missing or black, apply a default PBR material
                                 if (!child.material || child.material.color.getHex() === 0x000000) {
                                     child.material = new THREE.MeshStandardMaterial({
-                                        color: 0xcccccc, // Light grey fallback
+                                        color: 0xcccccc,
                                         roughness: 0.3,
                                         metalness: 0.5,
                                         envMap: scene.environment,
                                         envMapIntensity: 2.0
                                     });
                                 } else {
-                                    // Enhance existing material with PBR properties
                                     child.material.roughness = 0.3;
                                     child.material.metalness = 0.5;
                                     child.material.envMap = scene.environment;
@@ -173,8 +168,9 @@
                                 child.material.needsUpdate = true;
                             }
                         });
-                        console.log('Total meshes:', meshCount);
-                        if (meshCount === 0) console.error('No meshes found in model!');
+
+                        // Add decal after model is loaded
+                        addDecal();
                     },
                     function (xhr) {
                         console.log((xhr.loaded / xhr.total * 100) + '% loaded');
@@ -191,6 +187,44 @@
                 console.error('Error loading Mono.mtl:', error);
             }
         );
+
+        // Function to add a decal
+        function addDecal() {
+            const textureLoader = new THREE.TextureLoader();
+            textureLoader.load(
+                '55.png', // Path to your decal image
+                function (decalTexture) {
+                    // Decal material (alphaTest for transparency)
+                    const decalMaterial = new THREE.MeshPhongMaterial({
+                        map: decalTexture,
+                        transparent: true,
+                        alphaTest: 0.1, // Adjust to cut off transparency edges
+                        depthTest: true,
+                        depthWrite: false,
+                        polygonOffset: true,
+                        polygonOffsetFactor: -4 // Prevents z-fighting
+                    });
+
+                    // Decal position, orientation, and size
+                    const position = new THREE.Vector3(0, 0, 1); // Adjust X, Y, Z to position on model
+                    const orientation = new THREE.Euler(0, 0, 0); // Rotation in radians (X, Y, Z)
+                    const size = new THREE.Vector3(0.2, 0.2, 0.2); // Width, height, depth of projection
+
+                    // Apply decal to each mesh in the model
+                    model.traverse(child => {
+                        if (child.isMesh) {
+                            const decalGeometry = new THREE.DecalGeometry(child, position, orientation, size);
+                            const decal = new THREE.Mesh(decalGeometry, decalMaterial);
+                            scene.add(decal);
+                        }
+                    });
+                },
+                undefined,
+                function (error) {
+                    console.error('Error loading decal texture:', error);
+                }
+            );
+        }
 
 
 
