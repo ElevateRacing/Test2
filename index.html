@@ -53,7 +53,7 @@
         renderer.setClearColor(0xffffff, 1);
         //renderer.autoClear = true;
         renderer.toneMapping = THREE.ACESFilmicToneMapping; // Better color/contrast
-        renderer.toneMappingExposure = 1.0; // Adjust exposure
+        renderer.toneMappingExposure = 1.5; // Adjust exposure
         renderer.physicallyCorrectLights = true; // Realistic light falloff
         //renderer.setSize(container.clientWidth, container.clientHeight);
         //container.appendChild(renderer.domElement);
@@ -89,10 +89,10 @@
         ]);
         envMap.encoding = THREE.sRGBEncoding; // Better color for reflections
         scene.environment = envMap; // Apply to all PBR materials
-        scene.background = envMap; // Set as background (optional, can revert to grey)
+        //scene.background = envMap; // Set as background (optional, can revert to grey)
 
         // Add ambient lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Softer ambient
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); // Softer ambient
         scene.add(ambientLight);
 
         // Add directional lighting
