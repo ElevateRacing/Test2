@@ -127,8 +127,8 @@
         pointLight.position.set(0, 5, 5);
         scene.add(pointLight);
 */
-        // Load the model and add decals
-        let model; // To store the loaded OBJ for decal application
+        // Load the model and calculate dimensions
+        let model;
         const mtlLoader = new THREE.MTLLoader();
         mtlLoader.load(
             'Mono.mtl',
@@ -140,7 +140,7 @@
                 objLoader.load(
                     'Mono.obj',
                     function (object) {
-                        model = object; // Store the model
+                        model = object;
                         scene.add(model);
                         model.position.set(0, 0, 0);
                         model.scale.set(0.001, 0.001, 0.001);
@@ -151,20 +151,18 @@
                         // Calculate and log model dimensions
                         const boundingBox = new THREE.Box3().setFromObject(model);
                         const size = new THREE.Vector3();
-                        boundingBox.getSize(size); // Get dimensions
+                        boundingBox.getSize(size);
                         console.log('Model Dimensions (width, height, depth):', 
                             size.x.toFixed(3), size.y.toFixed(3), size.z.toFixed(3));
 
-                        // Center of the model
                         const center = new THREE.Vector3();
                         boundingBox.getCenter(center);
                         console.log('Model Center (x, y, z):', 
                             center.x.toFixed(3), center.y.toFixed(3), center.z.toFixed(3));
 
-                        // Optional: Add a visual bounding box helper
-                        const boxHelper = new THREE.Box3Helper(boundingBox, 0xffff00); // Yellow box
+                        const boxHelper = new THREE.Box3Helper(boundingBox, 0xffff00);
                         scene.add(boxHelper);
-                        
+
                         // Apply PBR material tweaks
                         model.traverse(child => {
                             if (child.isMesh) {
@@ -186,7 +184,7 @@
                             }
                         });
 
-                        // Add decal after model is loaded
+                        // Add decal with bounding box
                         addDecal();
                     },
                     function (xhr) {
@@ -205,36 +203,48 @@
             }
         );
 
-        // Function to add a decal
+        // Function to add a decal with a bounding box
         function addDecal() {
             const textureLoader = new THREE.TextureLoader();
             textureLoader.load(
-                '55.png', // Path to your decal image
+                'decal.png',
                 function (decalTexture) {
-                    // Decal material (alphaTest for transparency)
                     const decalMaterial = new THREE.MeshPhongMaterial({
                         map: decalTexture,
                         transparent: true,
-                        alphaTest: 0.1, // Adjust to cut off transparency edges
+                        alphaTest: 0.1,
                         depthTest: true,
                         depthWrite: false,
                         polygonOffset: true,
-                        polygonOffsetFactor: -4 // Prevents z-fighting
+                        polygonOffsetFactor: -4
                     });
 
-                    // Decal position, orientation, and size
-                    const position = new THREE.Vector3(0, -0.005, 0.5); // Adjust X, Y, Z to position on model
-                    const orientation = new THREE.Euler(0, 0, 0); // Rotation in radians (X, Y, Z)
-                    const size = new THREE.Vector3(0.015, 0.015, 0.015); // Width, height, depth of projection
+                    // Decal parameters
+                    const position = new THREE.Vector3(0, 0.1, 0); // Adjust as needed
+                    const orientation = new THREE.Euler(0, 0, 0);
+                    const size = new THREE.Vector3(0.2, 0.2, 0.2); // Width, height, depth
 
-                    // Apply decal to each mesh in the model
+                    // Apply decal and add bounding box
                     model.traverse(child => {
                         if (child.isMesh) {
                             const decalGeometry = new THREE.DecalGeometry(child, position, orientation, size);
                             const decal = new THREE.Mesh(decalGeometry, decalMaterial);
                             scene.add(decal);
+
+                            // Add a wireframe box to visualize the decal's projection area
+                            const boxGeometry = new THREE.BoxGeometry(size.x, size.y, size.z);
+                            const boxMaterial = new THREE.MeshBasicMaterial({
+                                color: 0x00ff00, // Green box
+                                wireframe: true
+                            });
+                            const decalBox = new THREE.Mesh(boxGeometry, boxMaterial);
+                            decalBox.position.copy(position);
+                            scene.add(decalBox);
                         }
                     });
+
+                    console.log('Decal added at position:', position);
+                    console.log('Decal size (width, height, depth):', size.x, size.y, size.z);
                 },
                 undefined,
                 function (error) {
