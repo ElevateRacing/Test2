@@ -136,14 +136,24 @@
 
                 // Apply PBR material to all meshes in the model
                 object.traverse(child => {
-                    if (child.isMesh) {
-                        child.material = new THREE.MeshStandardMaterial({
-                            color: 0xaaaaaa, // Base color (adjustable)
-                            roughness: 0.5,  // Lower for more reflectivity (0 = mirror, 1 = matte)
-                            metalness: 0.7,  // Higher for metallic look (0 = non-metal, 1 = full metal)
-                            envMap: envMap,  // Apply environment map for reflections
-                            envMapIntensity: 1.0 // Strength of reflections
-                        });
+                    if (child.isMesh && child.material) {
+                        // Convert to MeshStandardMaterial if not already
+                        if (!(child.material instanceof THREE.MeshStandardMaterial)) {
+                            child.material = new THREE.MeshStandardMaterial({
+                                map: child.material.map || null, // Preserve texture if present
+                                color: child.material.color || 0xffffff, // Preserve original color
+                                roughness: 0.3,  // Add shininess
+                                metalness: 0.5,  // Add metallic look
+                                envMap: envMap,
+                                envMapIntensity: 1.5 // Stronger reflections
+                            });
+                        } else {
+                            // Enhance existing MeshStandardMaterial
+                            child.material.roughness = 0.3;
+                            child.material.metalness = 0.5;
+                            child.material.envMap = envMap;
+                            child.material.envMapIntensity = 1.5;
+                        }
                     }
                 });
                 
