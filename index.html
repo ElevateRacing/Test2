@@ -207,6 +207,21 @@
                     const orientation = new THREE.Euler(0, 0, 0);
                     const size = new THREE.Vector3(0.015, 0.015, 0.015);
 
+                    // Add flat preview plane
+                    const planeGeometry = new THREE.PlaneGeometry(size.x, size.y); // Flat plane matching decal width/height
+                    const planeMaterial = new THREE.MeshBasicMaterial({
+                        map: decalTexture,
+                        transparent: true,
+                        side: THREE.DoubleSide // Visible from both sides
+                    });
+                    const decalPlane = new THREE.Mesh(planeGeometry, planeMaterial);
+                    decalPlane.position.copy(position);
+                    decalPlane.rotation.set(orientation.x, orientation.y, orientation.z);
+                    scene.add(decalPlane);
+
+
+
+                    
                     model.traverse(child => {
                         if (child.isMesh) {
                             const decalGeometry = new THREE.DecalGeometry(child, position, orientation, size);
