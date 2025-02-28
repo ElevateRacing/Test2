@@ -149,16 +149,16 @@
                                     if (!child.material || child.material.color.getHex() === 0x000000) {
                                         child.material = new THREE.MeshStandardMaterial({
                                             color: 0xcccccc,
-                                            roughness: 0.3,
-                                            metalness: 0.5,
+                                            roughness: 0.2,
+                                            metalness: 0.6,
                                             envMap: scene.environment,
-                                            envMapIntensity: 2.0
+                                            envMapIntensity: 3.0
                                         });
                                     } else {
-                                        child.material.roughness = 0.3;
-                                        child.material.metalness = 0.5;
+                                        child.material.roughness = 0.2;
+                                        child.material.metalness = 0.6;
                                         child.material.envMap = scene.environment;
-                                        child.material.envMapIntensity = 2.0;
+                                        child.material.envMapIntensity = 3.0;
                                     }
                                     child.material.needsUpdate = true;
                                 }
@@ -199,7 +199,7 @@
         controls.rotateSpeed = 2.0;    // Speed of rotation
         controls.zoomSpeed = 1.2;      // Speed of zooming
         controls.panSpeed = 0.8;       // Speed of panning
-        controls.staticMoving = false; // Smooth movement (dynamic damping)
+        controls.staticMoving = true; // Smooth movement (dynamic damping)
         controls.dynamicDampingFactor = 0.05; // Damping strength
         controls.minDistance = 0.3;      // Minimum zoom distance
         controls.maxDistance = 2;     // Maximum zoom distance
