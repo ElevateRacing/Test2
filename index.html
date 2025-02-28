@@ -192,12 +192,12 @@
         function addInteractivePlane() {
             const textureLoader = new THREE.TextureLoader();
             textureLoader.load(
-                'decal.png', // Reuse your decal texture
+                '55.png', // Reuse your decal texture
                 function (texture) {
                     const planeGeometry = new THREE.PlaneGeometry(0.1, 0.1); // Initial size
                     const planeMaterial = new THREE.MeshBasicMaterial({
                         map: texture,
-                        transparent: true,
+                        transparent: false,
                         side: THREE.DoubleSide
                     });
                     plane = new THREE.Mesh(planeGeometry, planeMaterial);
