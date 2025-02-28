@@ -53,10 +53,8 @@
         renderer.setClearColor(0xD3D3D3, 1);
         //renderer.autoClear = true;
         renderer.toneMapping = THREE.ACESFilmicToneMapping; // Better color/contrast
-        renderer.toneMappingExposure = 8.0; // Adjust exposure
+        renderer.toneMappingExposure = 2.0; // Adjust exposure
         renderer.physicallyCorrectLights = true; // Realistic light falloff
-        //renderer.setSize(container.clientWidth, container.clientHeight);
-        //container.appendChild(renderer.domElement);
         
         const container = document.getElementById('canvas-container');
         const leftText = document.getElementById('left-text');
@@ -103,12 +101,12 @@
 
         
         // Add ambient lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 30);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 2);
         scene.add(ambientLight);
 
         // Add directional lighting
-        const directionalLight1 = new THREE.DirectionalLight(0xffffff, 20);
-        directionalLight1.position.set(3, 3, 3);
+        const directionalLight1 = new THREE.DirectionalLight(0xffffff, 3);
+        directionalLight1.position.set(-3, -3, 3);
         scene.add(directionalLight1);
 
         // Add helper to visualize the directional light
@@ -145,42 +143,39 @@
                 object.scale.set(0.001, 0.001, 0.001);    // Adjust scale if needed
                 //object.rotation.z = Math.PI / 2; // Rotate 90 degrees around Z-axis
 
-                // Apply PBR material to all meshes in the model
-                object.traverse(child => {
-                    if (child.isMesh && child.material) {
-                        const originalColor = child.material.color ? child.material.color.getHex() : 0xffffff;
-                        console.log('Original material color:', child.material.color ? child.material.color.getHexString() : 'none');
+                console.log('Model loaded successfully!');
+                console.log('Object structure:', object);
 
-                        if (!(child.material instanceof THREE.MeshStandardMaterial)) {
-                            child.material = new THREE.MeshStandardMaterial({
-                                map: child.material.map || null,
-                                color: originalColor === 0x000000 ? 0xcccccc : originalColor, // Override black to light grey
-                                roughness: 0.1,  // Max shininess
-                                metalness: 0.0,  // Non-metallic for max brightness
-                                envMap: scene.environment,
-                                envMapIntensity: 10.0 // Max reflections
-                            });
-                        } else {
-                            child.material.roughness = 0.1;
-                            child.material.metalness = 0.0;
-                            child.material.envMap = scene.environment;
-                            child.material.envMapIntensity = 10.0;
-                            if (child.material.color && child.material.color.getHex() === 0x000000) {
-                                child.material.color.set(0xcccccc); // Override black
-                            }
-                        }
+                // Log mesh count and geometry
+                let meshCount = 0;
+                object.traverse(child => {
+                    if (child.isMesh) {
+                        meshCount++;
+                        console.log('Mesh found:', child);
+                        console.log('Geometry vertices:', child.geometry.attributes.position ? child.geometry.attributes.position.count : 'none');
+                        console.log('Original material:', child.material);
+
+                        // Force material override to bright color
+                        child.material = new THREE.MeshStandardMaterial({
+                            color: 0x00ff00, // Bright green for visibility
+                            roughness: 0.1,
+                            metalness: 0.0,
+                            envMap: scene.environment,
+                            envMapIntensity: 2.0 // Reduced for balance
+                        });
                     }
                 });
-                
-                console.log('Model loaded successfully!');
+                console.log('Total meshes:', meshCount);
+                if (meshCount === 0) console.error('No meshes found in model!');
             },
             function (xhr) {
                 console.log((xhr.loaded / xhr.total * 100) + '% loaded');
             },
             function (error) {
-                console.error('An error occurred:', error);
+                console.error('Error loading Mono.3mf:', error);
             }
         );
+
 
         // Position the camera
         camera.position.z = 1;
