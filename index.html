@@ -92,7 +92,7 @@
         );
 
         // Add ambient lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1.8);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 2.0);
         scene.add(ambientLight);
 
         // Add directional lighting
@@ -195,8 +195,8 @@
       // Add TrackballControls for unrestricted rotation
         const controls = new THREE.TrackballControls(camera, renderer.domElement);
         controls.rotateSpeed = 2.5;    // Speed of rotation
-        controls.zoomSpeed = 4;      // Speed of zooming
-        controls.panSpeed = 1.2;       // Speed of panning
+        controls.zoomSpeed = 5;      // Speed of zooming
+        controls.panSpeed = 2;       // Speed of panning
         controls.staticMoving = true; // Smooth movement (dynamic damping)
         controls.dynamicDampingFactor = 0.05; // Damping strength
         controls.minDistance = 0.3;      // Minimum zoom distance
