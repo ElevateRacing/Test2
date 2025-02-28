@@ -50,10 +50,10 @@
         const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 
-        renderer.setClearColor(0xffffff, 1);
+        renderer.setClearColor(#D3D3D3, 1);
         //renderer.autoClear = true;
         renderer.toneMapping = THREE.ACESFilmicToneMapping; // Better color/contrast
-        renderer.toneMappingExposure = 3.0; // Adjust exposure
+        renderer.toneMappingExposure = 6.0; // Adjust exposure
         renderer.physicallyCorrectLights = true; // Realistic light falloff
         //renderer.setSize(container.clientWidth, container.clientHeight);
         //container.appendChild(renderer.domElement);
@@ -96,11 +96,11 @@
 
         
         // Add ambient lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 5);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 15);
         scene.add(ambientLight);
 
         // Add directional lighting
-        const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.4);
+        const directionalLight1 = new THREE.DirectionalLight(0xffffff, 5);
         directionalLight1.position.set(5, 10, 5);
         scene.add(directionalLight1);
 
