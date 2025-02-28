@@ -42,7 +42,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fflate@0.7.4/umd/index.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/3MFLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/controls/TrackballControls.js"></script>
     <script>
         // Scene, camera, and renderer setup
         const scene = new THREE.Scene();
@@ -107,18 +107,15 @@
         // Position the camera
         camera.position.z = 1;
 
-        // Add orbit controls for manipulation
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = false;
-        controls.dampingFactor = 0.05;
-        controls.minDistance = 10;
-        controls.maxDistance = 5;
-        controls.enableZoom = true;
-        controls.zoomSpeed = 1.0;
-        controls.minPolarAngle = 0;          // Allow full rotation (0 degrees)
-        controls.maxPolarAngle = 2 * Math.PI; // Allow full rotation (360 degrees)
-        controls.target.set(0, 0, 0);
-        controls.update();
+      // Add TrackballControls for unrestricted rotation
+        const controls = new THREE.TrackballControls(camera, renderer.domElement);
+        controls.rotateSpeed = 2.0;    // Speed of rotation
+        controls.zoomSpeed = 1.2;      // Speed of zooming
+        controls.panSpeed = 0.8;       // Speed of panning
+        controls.staticMoving = false; // Smooth movement (dynamic damping)
+        controls.dynamicDampingFactor = 0.1; // Damping strength
+        controls.minDistance = 2;      // Minimum zoom distance
+        controls.maxDistance = 10;     // Maximum zoom distance
 
         function resizeRenderer() {
             const totalWidth = wrapper.clientWidth;
