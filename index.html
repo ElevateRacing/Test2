@@ -53,7 +53,7 @@
         renderer.setClearColor(0xD3D3D3, 1);
         //renderer.autoClear = true;
         renderer.toneMapping = THREE.ACESFilmicToneMapping; // Better color/contrast
-        renderer.toneMappingExposure = 6.0; // Adjust exposure
+        renderer.toneMappingExposure = 8.0; // Adjust exposure
         renderer.physicallyCorrectLights = true; // Realistic light falloff
         //renderer.setSize(container.clientWidth, container.clientHeight);
         //container.appendChild(renderer.domElement);
@@ -96,11 +96,11 @@
 
         
         // Add ambient lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 15);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 30);
         scene.add(ambientLight);
 
         // Add directional lighting
-        const directionalLight1 = new THREE.DirectionalLight(0xffffff, 5);
+        const directionalLight1 = new THREE.DirectionalLight(0xffffff, 20);
         directionalLight1.position.set(3, 3, 3);
         scene.add(directionalLight1);
 
@@ -141,22 +141,26 @@
                 // Apply PBR material to all meshes in the model
                 object.traverse(child => {
                     if (child.isMesh && child.material) {
-                        // Convert to MeshStandardMaterial if not already
+                        const originalColor = child.material.color ? child.material.color.getHex() : 0xffffff;
+                        console.log('Original material color:', child.material.color ? child.material.color.getHexString() : 'none');
+
                         if (!(child.material instanceof THREE.MeshStandardMaterial)) {
                             child.material = new THREE.MeshStandardMaterial({
-                                map: child.material.map || null, // Preserve texture if present
-                                color: child.material.color || 0xffffff, // Preserve original color
-                                roughness: 0.3,  // Add shininess
-                                metalness: 0.5,  // Add metallic look
+                                map: child.material.map || null,
+                                color: originalColor === 0x000000 ? 0xcccccc : originalColor, // Override black to light grey
+                                roughness: 0.1,  // Max shininess
+                                metalness: 0.0,  // Non-metallic for max brightness
                                 envMap: scene.environment,
-                                envMapIntensity: 2.0 // Stronger reflections
+                                envMapIntensity: 10.0 // Max reflections
                             });
                         } else {
-                            // Enhance existing MeshStandardMaterial
-                            child.material.roughness = 0.3;
-                            child.material.metalness = 0.5;
-                            child.material.envMap = scene.environment,
-                            child.material.envMapIntensity = 1.5;
+                            child.material.roughness = 0.1;
+                            child.material.metalness = 0.0;
+                            child.material.envMap = scene.environment;
+                            child.material.envMapIntensity = 10.0;
+                            if (child.material.color && child.material.color.getHex() === 0x000000) {
+                                child.material.color.set(0xcccccc); // Override black
+                            }
                         }
                     }
                 });
