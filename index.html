@@ -96,14 +96,14 @@
         scene.add(ambientLight);
 
         // Add directional lighting
-        const directionalLight1 = new THREE.DirectionalLight(0xffffff, 2);
-        directionalLight1.position.set(-3, -3, 3);
+        const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.4);
+        directionalLight1.position.set(5, 10, 5);
         scene.add(directionalLight1);
 
         // Add helper to visualize the directional light
         const lightHelper1 = new THREE.DirectionalLightHelper(directionalLight1, 1); // Size of helper = 1 unit
         scene.add(lightHelper1);
-/*
+
         const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.6);
         directionalLight2.position.set(-5, 5, -5);
         scene.add(directionalLight2);
@@ -123,7 +123,7 @@
         const pointLight = new THREE.PointLight(0xffffff, 0.3, 50);
         pointLight.position.set(0, 5, 5);
         scene.add(pointLight);
-*/
+
         // Function to load a model with MTL and OBJ
         function loadModel(mtlPath, objPath, position = {x: 0, y: 0, z: 0}) {
             const mtlLoader = new THREE.MTLLoader();
