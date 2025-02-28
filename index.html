@@ -191,8 +191,8 @@
         loadModel('models/Side_cover_top_l.mtl', 'models/Side_cover_top_l.obj', {x: 0, y: 0, z: 0});
         loadModel('models/Side_cover_r.mtl', 'models/Side_cover_r.obj', {x: 0, y: 0, z: 0});
         loadModel('models/Side_cover_bottom_l.mtl', 'models/Side_cover_bottom_l.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Part2.mtl', 'models/Part2.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Part2.mtl', 'models/Part2.obj', {x: 0, y: 0, z: 0});
+        loadModel('models/Seat_belts.mtl', 'models/Seat_belts.obj', {x: 0, y: 0, z: 0});
+        loadModel('models/Canopy_edge.mtl', 'models/Canopy_edge.obj', {x: 0, y: 0, z: 0});
         loadModel('models/Part2.mtl', 'models/Part2.obj', {x: 0, y: 0, z: 0});
         loadModel('models/Part2.mtl', 'models/Part2.obj', {x: 0, y: 0, z: 0});
         loadModel('models/Part2.mtl', 'models/Part2.obj', {x: 0, y: 0, z: 0});
@@ -207,8 +207,8 @@
       // Add TrackballControls for unrestricted rotation
         const controls = new THREE.TrackballControls(camera, renderer.domElement);
         controls.rotateSpeed = 2.5;    // Speed of rotation
-        controls.zoomSpeed = 2;      // Speed of zooming
-        controls.panSpeed = 0.8;       // Speed of panning
+        controls.zoomSpeed = 4;      // Speed of zooming
+        controls.panSpeed = 1.2;       // Speed of panning
         controls.staticMoving = true; // Smooth movement (dynamic damping)
         controls.dynamicDampingFactor = 0.05; // Damping strength
         controls.minDistance = 0.3;      // Minimum zoom distance
