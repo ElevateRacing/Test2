@@ -138,7 +138,7 @@
                         objPath,
                         function (object) {
                             object.position.set(position.x, position.y, position.z);
-                            object.scale.set(0.001, 0.001, 0.001); // Consistent scale
+                            object.scale.set(0.004, 0.004, 0.004); // Consistent scale
                             scene.add(object);
 
                             console.log(`${objPath} loaded successfully at position:`, position);
@@ -201,8 +201,8 @@
         controls.panSpeed = 0.8;       // Speed of panning
         controls.staticMoving = false; // Smooth movement (dynamic damping)
         controls.dynamicDampingFactor = 0.05; // Damping strength
-        controls.minDistance = 0.5;      // Minimum zoom distance
-        controls.maxDistance = 3;     // Maximum zoom distance
+        controls.minDistance = 0.3;      // Minimum zoom distance
+        controls.maxDistance = 2;     // Maximum zoom distance
 
         function resizeRenderer() {
             const totalWidth = wrapper.clientWidth;
