@@ -131,7 +131,7 @@
             function (object) {
                 scene.add(object);
                 object.position.set(0, 0, 0); // Center the model
-                object.scale.set(0.002, 0.002, 0.002);    // Adjust scale if needed
+                object.scale.set(0.001, 0.001, 0.001);    // Adjust scale if needed
                 //object.rotation.z = Math.PI / 2; // Rotate 90 degrees around Z-axis
 
                 // Apply PBR material to all meshes in the model
@@ -177,8 +177,8 @@
         controls.panSpeed = 0.8;       // Speed of panning
         controls.staticMoving = false; // Smooth movement (dynamic damping)
         controls.dynamicDampingFactor = 0.1; // Damping strength
-        controls.minDistance = 2;      // Minimum zoom distance
-        controls.maxDistance = 10;     // Maximum zoom distance
+        controls.minDistance = 0.5;      // Minimum zoom distance
+        controls.maxDistance = 3;     // Maximum zoom distance
 
         function resizeRenderer() {
             const totalWidth = wrapper.clientWidth;
