@@ -93,6 +93,7 @@
                 scene.add(object);
                 object.position.set(0, 0, 0); // Center the model
                 object.scale.set(0.001, 0.001, 0.001);    // Adjust scale if needed
+                object.rotation.z = Math.PI / 2; // Rotate 90 degrees around Z-axis
                 console.log('Model loaded successfully!');
             },
             function (xhr) {
@@ -104,7 +105,7 @@
         );
 
         // Position the camera
-        camera.position.x = 1;
+        camera.position.z = 1;
 
         // Add orbit controls for manipulation
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
