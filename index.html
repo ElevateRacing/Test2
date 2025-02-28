@@ -47,7 +47,7 @@
     <script>
         // Scene, camera, and renderer setup
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000); //Reduce FOV from 75 to 45
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 
         renderer.setClearColor(0xffffff, 1);
@@ -195,7 +195,7 @@
                 
 
         // Position the camera
-        camera.position.z = 1;
+        camera.position.z = 1.5;
 
       // Add TrackballControls for unrestricted rotation
         const controls = new THREE.TrackballControls(camera, renderer.domElement);
