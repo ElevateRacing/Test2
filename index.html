@@ -143,23 +143,11 @@
 
                             console.log(`${objPath} loaded successfully at position:`, position);
 
-                            // Apply PBR material tweaks
+                            // Add environment map to enhance .mtl materials
                             object.traverse(child => {
-                                if (child.isMesh) {
-                                    if (!child.material || child.material.color.getHex() === 0x000000) {
-                                        child.material = new THREE.MeshStandardMaterial({
-                                            color: 0xcccccc,
-                                            roughness: 0.05,
-                                            metalness: 0.85,
-                                            envMap: scene.environment,
-                                            envMapIntensity: 3.0
-                                        });
-                                    } else {
-                                        child.material.roughness = 0.05;
-                                        child.material.metalness = 0.85;
-                                        child.material.envMap = scene.environment;
-                                        child.material.envMapIntensity = 3.0;
-                                    }
+                                if (child.isMesh && child.material) {
+                                    child.material.envMap = scene.environment;
+                                    child.material.envMapIntensity = 2.0; // Adjust intensity as needed
                                     child.material.needsUpdate = true;
                                 }
                             });
