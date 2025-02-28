@@ -77,20 +77,24 @@
         const axesHelper = new THREE.AxesHelper(1); // Size of 1 unit
         scene.add(axesHelper);
 
-        // Load environment map for reflections (using a cube map)
-        const cubeTextureLoader = new THREE.CubeTextureLoader();
-        const envMap = cubeTextureLoader.load([
-            'https://threejs.org/examples/textures/cube/pisa/px.png',
-            'https://threejs.org/examples/textures/cube/pisa/nx.png',
-            'https://threejs.org/examples/textures/cube/pisa/py.png',
-            'https://threejs.org/examples/textures/cube/pisa/ny.png',
-            'https://threejs.org/examples/textures/cube/pisa/pz.png',
-            'https://threejs.org/examples/textures/cube/pisa/nz.png'
-        ]);
-        envMap.encoding = THREE.sRGBEncoding; // Better color for reflections
-        scene.environment = envMap; // Apply to all PBR materials
-        //scene.background = envMap; // Set as background (optional, can revert to grey)
+        // Load HDRI environment map
+        const rgbeLoader = new THREE.RGBELoader();
+        rgbeLoader.load(
+            'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/autumn_field_1k.hdr', // Example HDRI from Poly Haven
+            function (texture) {
+                texture.mapping = THREE.EquirectangularReflectionMapping; // Required for HDRI
+                scene.environment = texture; // Apply to materials for reflections
+                // scene.background = texture; // Uncomment to set as background (optional)
+                console.log('HDRI environment loaded successfully!');
+            },
+            undefined,
+            function (error) {
+                console.error('Error loading HDRI:', error);
+            }
+        );
 
+
+        
         // Add ambient lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 5);
         scene.add(ambientLight);
@@ -144,14 +148,14 @@
                                 color: child.material.color || 0xffffff, // Preserve original color
                                 roughness: 0.3,  // Add shininess
                                 metalness: 0.5,  // Add metallic look
-                                envMap: envMap,
+                                envMap: scene.environment,
                                 envMapIntensity: 2.0 // Stronger reflections
                             });
                         } else {
                             // Enhance existing MeshStandardMaterial
                             child.material.roughness = 0.3;
                             child.material.metalness = 0.5;
-                            child.material.envMap = envMap;
+                            child.material.envMap = scene.environment,
                             child.material.envMapIntensity = 1.5;
                         }
                     }
