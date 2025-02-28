@@ -223,9 +223,9 @@
                     });
 
                     // Decal position, orientation, and size
-                    const position = new THREE.Vector3(0, 0.005, 1); // Adjust X, Y, Z to position on model
+                    const position = new THREE.Vector3(0, -0.005, 0.5); // Adjust X, Y, Z to position on model
                     const orientation = new THREE.Euler(0, 0, 0); // Rotation in radians (X, Y, Z)
-                    const size = new THREE.Vector3(0.02, 0.02, 0.02); // Width, height, depth of projection
+                    const size = new THREE.Vector3(0.015, 0.015, 0.015); // Width, height, depth of projection
 
                     // Apply decal to each mesh in the model
                     model.traverse(child => {
