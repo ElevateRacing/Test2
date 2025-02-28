@@ -44,7 +44,6 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/MTLLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/controls/TrackballControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/RGBELoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/geometries/DecalGeometry.js"></script>
     <script>
         // Scene, camera, and renderer setup
         const scene = new THREE.Scene();
@@ -92,8 +91,6 @@
             }
         );
 
-
-        
         // Add ambient lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 2);
         scene.add(ambientLight);
@@ -127,91 +124,67 @@
         pointLight.position.set(0, 5, 5);
         scene.add(pointLight);
 */
-        // Load the model
-        let model;
-        const mtlLoader = new THREE.MTLLoader();
-        mtlLoader.load(
-            'Mono.mtl',
-            function (materials) {
-                materials.preload();
+        // Function to load a model with MTL and OBJ
+        function loadModel(mtlPath, objPath, position = {x: 0, y: 0, z: 0}) {
+            const mtlLoader = new THREE.MTLLoader();
+            mtlLoader.load(
+                mtlPath,
+                function (materials) {
+                    materials.preload();
 
-                const objLoader = new THREE.OBJLoader();
-                objLoader.setMaterials(materials);
-                objLoader.load(
-                    'Mono.obj',
-                    function (object) {
-                        model = object;
-                        scene.add(model);
-                        model.position.set(0, 0, 0);
-                        model.scale.set(0.001, 0.001, 0.001);
+                    const objLoader = new THREE.OBJLoader();
+                    objLoader.setMaterials(materials);
+                    objLoader.load(
+                        objPath,
+                        function (object) {
+                            object.position.set(position.x, position.y, position.z);
+                            object.scale.set(0.001, 0.001, 0.001); // Consistent scale
+                            scene.add(object);
 
-                        console.log('Model loaded successfully!');
+                            console.log(`${objPath} loaded successfully at position:`, position);
 
-                        // Apply PBR material tweaks
-                        model.traverse(child => {
-                            if (child.isMesh) {
-                                if (!child.material || child.material.color.getHex() === 0x000000) {
-                                    child.material = new THREE.MeshStandardMaterial({
-                                        color: 0xcccccc,
-                                        roughness: 0.3,
-                                        metalness: 0.5,
-                                        envMap: scene.environment,
-                                        envMapIntensity: 2.0
-                                    });
-                                } else {
-                                    child.material.roughness = 0.3;
-                                    child.material.metalness = 0.5;
-                                    child.material.envMap = scene.environment;
-                                    child.material.envMapIntensity = 2.0;
+                            // Apply PBR material tweaks
+                            object.traverse(child => {
+                                if (child.isMesh) {
+                                    if (!child.material || child.material.color.getHex() === 0x000000) {
+                                        child.material = new THREE.MeshStandardMaterial({
+                                            color: 0xcccccc,
+                                            roughness: 0.3,
+                                            metalness: 0.5,
+                                            envMap: scene.environment,
+                                            envMapIntensity: 2.0
+                                        });
+                                    } else {
+                                        child.material.roughness = 0.3;
+                                        child.material.metalness = 0.5;
+                                        child.material.envMap = scene.environment;
+                                        child.material.envMapIntensity = 2.0;
+                                    }
+                                    child.material.needsUpdate = true;
                                 }
-                                child.material.needsUpdate = true;
-                            }
-                        });
-
-                        // Add interactive plane
-                        addInteractivePlane();
-                    },
-                    function (xhr) {
-                        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-                    },
-                    function (error) {
-                        console.error('Error loading Mono.obj:', error);
-                    }
-                );
-            },
-            function (xhr) {
-                console.log('MTL ' + (xhr.loaded / xhr.total * 100) + '% loaded');
-            },
-            function (error) {
-                console.error('Error loading Mono.mtl:', error);
-            }
-        );
-
-        // Function to add an interactive plane
-        let plane;
-        function addInteractivePlane() {
-            const textureLoader = new THREE.TextureLoader();
-            textureLoader.load(
-                '55.png', // Reuse your decal texture
-                function (texture) {
-                    const planeGeometry = new THREE.PlaneGeometry(0.1, 0.1); // Initial size
-                    const planeMaterial = new THREE.MeshBasicMaterial({
-                        map: texture,
-                        transparent: false,
-                        side: THREE.DoubleSide
-                    });
-                    plane = new THREE.Mesh(planeGeometry, planeMaterial);
-                    plane.position.set(0, 0, 0); // Center of the scene
-                    scene.add(plane);
-
-                    console.log('Interactive plane added at position:', plane.position);
+                            });
+                        },
+                        function (xhr) {
+                            console.log(`${objPath}: ${(xhr.loaded / xhr.total * 100)}% loaded`);
+                        },
+                        function (error) {
+                            console.error(`Error loading ${objPath}:`, error);
+                        }
+                    );
                 },
-                undefined,
+                function (xhr) {
+                    console.log(`${mtlPath}: ${(xhr.loaded / xhr.total * 100)}% loaded`);
+                },
                 function (error) {
-                    console.error('Error loading plane texture:', error);
+                    console.error(`Error loading ${mtlPath}:`, error);
                 }
             );
         }
+
+        // Load multiple models to form an assembly
+        loadModel('Mono.mtl', 'Mono.obj', {x: 0, y: 0, z: 0}); // Base model at center
+        loadModel('Part1.mtl', 'Part1.obj', {x: 0.1, y: 0, z: 0}); // Example part offset to the right
+        loadModel('Part2.mtl', 'Part2.obj', {x: -0.1, y: 0, z: 0}); // Example part offset to the left
 
 
 
