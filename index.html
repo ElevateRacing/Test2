@@ -155,14 +155,9 @@
                         console.log('Geometry vertices:', child.geometry.attributes.position ? child.geometry.attributes.position.count : 'none');
                         console.log('Original material:', child.material);
 
-                        // Force material override to bright color
-                        child.material = new THREE.MeshStandardMaterial({
-                            color: 0x00ff00, // Bright green for visibility
-                            roughness: 0.1,
-                            metalness: 0.0,
-                            envMap: scene.environment,
-                            envMapIntensity: 2.0 // Reduced for balance
-                        });
+                        // Force MeshBasicMaterial (no lighting needed)
+                        child.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); // Bright green
+                        child.material.needsUpdate = true; // Ensure material updates
                     }
                 });
                 console.log('Total meshes:', meshCount);
