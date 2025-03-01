@@ -25,10 +25,10 @@ body {
 #wrapper {
     display: grid;
     grid-template-areas:
-        "header header header"
-        "top top top"
+        "header"
+        "top"
         "left canvas right"
-        "bottom bottom bottom";
+        "bottom";
     grid-template-columns: minmax(200px, auto) 1fr minmax(100px, auto);
     grid-template-rows: auto auto 1fr auto;
     gap: 10px;
@@ -78,6 +78,7 @@ body {
     color: #404040;
     cursor: pointer;
     text-align: center;
+    transition: background-color 0.3s ease; /* Only background changes */
 }
 
 .header-button:hover {
