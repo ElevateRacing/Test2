@@ -266,38 +266,15 @@
 
         // Animation loop
         function animate() {
-    requestAnimationFrame(animate);
-    controls.update(); // Apply user input
+            requestAnimationFrame(animate);
+            controls.update(); // Apply user input
 
-    if (objectBoundingBox) {
-        // Calculate ideal distance to fit object in view
-        const maxDim = Math.max(objectSize.x, objectSize.y, objectSize.z);
-        const fov = camera.fov * (Math.PI / 180); // FOV in radians
-        const minDistance = maxDim / (2 * Math.tan(fov / 2)) * 1.2; // Fit with padding
+            // Rotate the entire scene slowly around the Z-axis
+            scene.rotation.z += 0.005; // Adjust this value for rotation speed (radians per frame)
 
-        // Get current camera direction from controls
-        const direction = new THREE.Vector3();
-        camera.getWorldDirection(direction); // Direction camera is facing
-
-        // Current distance from camera to object center
-        const currentDistance = camera.position.distanceTo(objectCenter);
-
-        // Adjust distance if too close or too far
-        if (currentDistance < minDistance) {
-            const offset = direction.clone().multiplyScalar(minDistance);
-            camera.position.copy(objectCenter).add(offset);
-        } else if (currentDistance > minDistance * 3) { // Optional max distance
-            const offset = direction.clone().multiplyScalar(minDistance * 1.5);
-            camera.position.copy(objectCenter).add(offset);
+            renderer.clear();
+            renderer.render(scene, camera);
         }
-
-        // Ensure camera looks at the object center
-        camera.lookAt(objectCenter);
-    }
-
-    renderer.clear();
-    renderer.render(scene, camera);
-}
         animate();
         </script>
 </body>
