@@ -19,21 +19,32 @@ body {
     src: url('FORMULA1-BOLD.OTF') format('opentype');
 }
 
+#grid-container {
+    display: grid;
+    grid-template-areas:
+        "header header header"
+        "top-text top-text top-text"
+        "left-text canvas right-text"
+        "bottom-text bottom-text bottom-text";
+    grid-template-columns: 1fr 2fr 1fr; /* Left: 1fr, Middle: 2fr (wider), Right: 1fr */
+    grid-template-rows: auto auto 1fr auto; /* Header, Top text, Content (flexible), Bottom text */
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    min-height: 100vh; /* Full viewport height */
+    gap: 20px; /* Space between grid rows */
+}
+
 #header-box {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    background-color: #ffffff; /* Light grey */
-    margin-top: 5px; /* Small distance from top */
-    margin-left: 15px; /* Bigger left margin */
-    margin-right: 15px; /* Bigger right margin */
+    grid-area: header;
+    background-color: #ffffff;
+    margin: 0 15px;
     padding: 5px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-radius: 15px; /* Rounded edges */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Small shadow at bottom */
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
     transition: background-color 0.3s ease;
 }
@@ -69,18 +80,9 @@ body {
     background-color: #4d4d4d;
     color: #ffffff;
 }
-#wrapper {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh; /* Full viewport height */
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto; /* Center horizontally */
-    padding: 80px 15px 0 15px; /* Top padding for header, match left/right margins */
-    box-sizing: border-box;
-}
 
 #top-text {
+    grid-area: top-text;
     text-align: center;
     padding: 20px 0;
     font-family: 'FORMULA1-WIDE', sans-serif;
@@ -88,37 +90,31 @@ body {
     color: #DF4949;
 }
 
-#content {
-    display: flex;
-    flex: 1; /* Takes remaining space between top and bottom text */
-    gap: 20px;
-    width: 100%;
-    padding-bottom: 20px; /* Space before bottom text */
-}
-
 #left-text {
-    flex: 1; /* Equal width with right-text */
-    min-width: 0; /* Prevent overflow */
+    grid-area: left-text;
+    padding: 20px;
     font-family: 'FORMULA1-REGULAR', sans-serif;
     font-size: 18px;
     color: #595959;
 }
 
 #canvas-container {
-    height: 400px;
+    grid-area: canvas;
+    min-height: 200px;
     width: 100%;
     box-sizing: border-box;
 }
 
 #right-text {
-    flex: 1; /* Equal width with left-text */
-    min-width: 0;
+    grid-area: right-text;
+    padding: 20px;
     font-family: 'FORMULA1-REGULAR', sans-serif;
     font-size: 18px;
     color: #595959;
 }
 
 #bottom-text {
+    grid-area: bottom-text;
     text-align: center;
     padding: 20px 0;
     font-family: 'FORMULA1-REGULAR', sans-serif;
@@ -126,6 +122,6 @@ body {
     color: #7F7F7F;
     position: sticky; /* Stick to bottom */
     bottom: 0;
-    background-color: #ffffff; /* Ensure visibility over content */
+    background-color: #ffffff; /* Ensure visibility */
     z-index: 5;
 }
