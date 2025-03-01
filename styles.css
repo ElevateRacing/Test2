@@ -23,15 +23,8 @@ body {
 }
 
 #wrapper {
-    display: grid;
-    grid-template-areas:
-        "header"
-        "top"
-        "left canvas right"
-        "bottom";
-    grid-template-columns: minmax(200px, auto) 1fr minmax(100px, auto);
-    grid-template-rows: auto auto 1fr auto;
-    gap: 10px;
+    display: flex;
+    flex-direction: column;
     width: 100%;
     max-width: 100%;
     padding: 10px;
@@ -39,7 +32,6 @@ body {
 }
 
 #header-box {
-    grid-area: header;
     background-color: #d3d3d3; /* Light grey */
     margin: 10px; /* Small distance from top */
     margin-left: 15px; /* Bigger left margin */
@@ -51,12 +43,12 @@ body {
     border-radius: 15px; /* Rounded edges */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Small shadow at bottom */
     box-sizing: border-box;
-    width: auto;
     transition: background-color 0.3s ease;
 }
 
 #header-box:hover {
     background-color: #ffdab9; /* Light orange (peachpuff) on hover */
+}
 
 #logo {
     padding: 10px;
@@ -84,98 +76,10 @@ body {
 .header-button:hover {
     background-color: #f0f0f0;
 }
-    
-#top-text {
-    grid-area: top;
-    text-align: center;
-    padding: 10px;
-    white-space: nowrap;
-}
-
-#top-text .first-word {
-    font-family: 'FORMULA1-WIDE', sans-serif;
-    color: #DF4949;
-    font-size: 40px;
-}
-
-#top-text .rest-words {
-    font-family: 'FORMULA1-BOLD', sans-serif;
-    color: #7f7f7f;
-    font-size: 40px;
-}
-
-#left-text {
-    grid-area: left;
-    padding: 30px;
-    padding-top: 100px;
-    min-width: 0;
-    word-wrap: break-word;
-    font-size: 18px;
-    box-sizing: border-box;
-}
-
-#left-text .regular {
-    font-family: 'FORMULA1-REGULAR', sans-serif;
-    color: #595959;
-}
-
-#left-text .bold {
-    font-family: 'FORMULA1-BOLD', sans-serif;
-    color: #404040;
-}
-
-#left-text .separator {
-    border: 0;
-    height: 2px;
-    background: #D0CECE;
-    width: 150px;
-    margin: 50px 0;
-}
-
-#left-text .spacer {
-    height: 20px;
-}
 
 #canvas-container {
     grid-area: canvas;
     height: 400px;
     width: 100%;
     box-sizing: border-box;
-}
-
-#right-text {
-    grid-area: right;
-    padding: 30px;
-    padding-top: 100px;
-    min-width: 0;
-    word-wrap: break-word;
-    font-size: 18px;
-    box-sizing: border-box;
-}
-
-#right-text .regular {
-    font-family: 'FORMULA1-REGULAR', sans-serif;
-    color: #595959;
-}
-
-#right-text .bold {
-    font-family: 'FORMULA1-BOLD', sans-serif;
-    color: #404040;
-}
-
-#right-text .separator {
-    border: 0;
-    height: 2px;
-    background: #D0CECE;
-    width: 150px;
-    margin: 50px 0;
-}
-
-#bottom-text {
-    grid-area: bottom;
-    text-align: center;
-    padding: 10px;
-    font-family: 'FORMULA1-REGULAR', sans-serif;
-    color: #7F7F7F;
-    font-size: 18px;
 }
