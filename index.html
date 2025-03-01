@@ -143,10 +143,10 @@
 
                     console.log(`${objPath} loaded successfully at position:`, position);
 
-                    // Force override material for Mono.obj
+                    // Apply Giallo Modena only to Powder_Coat_(Red) parts of Mono.obj
                     if (objPath === 'Mono.obj') {
                         object.traverse(child => {
-                            if (child.isMesh) { // Apply to all mesh children of Mono.obj
+                            if (child.isMesh && child.material && child.material.name === 'Powder_Coat_(Red)') {
                                 const pbrMaterial = new THREE.MeshStandardMaterial({
                                     color: 0xffd300,        // Giallo Modena (RGB 255, 211, 0)
                                     metalness: 0.2,         // Slightly metallic for powder coat realism
@@ -156,6 +156,7 @@
                                 });
                                 child.material = pbrMaterial;
                                 child.material.needsUpdate = true;
+                                console.log('Replaced Powder_Coat_(Red) with Giallo Modena on mesh:', child);
                             }
                         });
                     }
