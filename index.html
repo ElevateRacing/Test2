@@ -53,7 +53,7 @@
         renderer.setClearColor(0xffffff, 1);
         //renderer.autoClear = true;
         renderer.toneMapping = THREE.ACESFilmicToneMapping; // Better color/contrast
-        renderer.toneMappingExposure = 0.95; // Adjust exposure
+        renderer.toneMappingExposure = 0.9; // Adjust exposure
         renderer.physicallyCorrectLights = true; // Realistic light falloff
         
         const container = document.getElementById('canvas-container');
@@ -194,7 +194,7 @@
         loadModel('models/Throttle.mtl', 'models/Throttle.obj', {x: 0, y: 0, z: 0});
         loadModel('models/Display.mtl', 'models/Display.obj', {x: 0, y: 0, z: 0});
         loadModel('models/Skids.mtl', 'models/Skids.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Arm_aft.mtl', 'models/Arm_aft.obj', {x: 0, y: 0, z: 0});
+        loadModel('Arm_aft.mtl', 'Arm_aft.obj', {x: 0, y: 0, z: 0});
         loadModel('models/Ducts_aft_top.mtl', 'models/Ducts_aft_top.obj', {x: 0, y: 0, z: 0});
         loadModel('models/Motors_Aft.mtl', 'models/Motors_Aft.obj', {x: 0, y: 0, z: 0});
         loadModel('models/Ducts_aft_bottom.mtl', 'models/Ducts_aft_bottom.obj', {x: 0, y: 0, z: 0});
