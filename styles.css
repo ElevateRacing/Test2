@@ -42,15 +42,22 @@ body {
     grid-area: header;
     background-color: #d3d3d3; /* Light grey */
     margin-top: 10px; /* Small distance from top */
+    margin-left: 10px; /* Bigger left margin */
+    margin-right: 10px; /* Bigger right margin */
     padding: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 2px solid #d3d3d3; /* Squared edges */
+    border-radius: 10px; /* Rounded edges */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Small shadow at bottom */
     box-sizing: border-box;
-    width: 100%;
+    width: auto;
+    transition: background-color 0.3s ease;
 }
-    
+
+#header-box:hover {
+    background-color: #ffdab9; /* Light orange (peachpuff) on hover */
+
 #logo {
     padding: 10px;
     min-width: 0;
