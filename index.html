@@ -148,7 +148,7 @@
                         object.traverse(child => {
                             if (child.isMesh && child.material.name === 'Powder_Coat_(Red)') {
                                 const pbrMaterial = new THREE.MeshStandardMaterial({
-                                    color: 0xff2800,        // Ferrari red (RGB 255, 40, 0)
+                                    color: 0xffd300,        // Ferrari red (RGB 255, 40, 0)
                                     metalness: 0.2,         // Slightly metallic for powder coat realism
                                     roughness: 0.3,         // Smooth but not mirror-like
                                     envMap: scene.environment, // Use HDRI for reflections
