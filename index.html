@@ -163,65 +163,54 @@
             );
         });
     }
-/* 
-                    console.log(`${objPath} loaded successfully at position:`, position);
-                    
-                    // Apply Giallo Modena only to Powder_Coat_(Red) parts of Mono.obj
-                    if (objPath === 'Mono.obj') {
-                        object.traverse(child => {
-                            if (child.isMesh && child.material && child.material.name === 'Powder_Coat_(Red)') {
-                                const pbrMaterial = new THREE.MeshStandardMaterial({
-                                    color: 0xffd300,        // Giallo Modena (RGB 255, 211, 0)
-                                    metalness: 0.2,         // Slightly metallic for powder coat realism
-                                    roughness: 0.3,         // Smooth but not mirror-like
-                                    envMap: scene.environment, // Use HDRI for reflections
-                                    envMapIntensity: 3.0    // Strong reflections
-                                });
-                                child.material = pbrMaterial;
-                                child.material.needsUpdate = true;
-                                console.log('Replaced Powder_Coat_(Red) with Giallo Modena on mesh:', child);
-                            }
-                        });
-                    }
-*/  
-                            
 
-
-        // List of remaining parts to load
-        const remainingParts = [
-            { mtl: 'models/Front_cover.mtl', obj: 'models/Front_cover.obj' },
-            { mtl: 'models/Rear_cover.mtl', obj: 'models/Rear_cover.obj' },
-            { mtl: 'models/Seat.mtl', obj: 'models/Seat.obj' },
-            { mtl: 'models/Roll_hoop.mtl', obj: 'models/Roll_hoop.obj' },
-            { mtl: 'models/Roll_hoop_cover.mtl', obj: 'models/Roll_hoop_cover.obj' },
-            { mtl: 'models/Side_cover_top_l.mtl', obj: 'models/Side_cover_top_l.obj' },
-            { mtl: 'models/Side_cover_r.mtl', obj: 'models/Side_cover_r.obj' },
-            { mtl: 'models/Side_cover_bottom_l.mtl', obj: 'models/Side_cover_bottom_l.obj' },
-            { mtl: 'models/Seat_belts.mtl', obj: 'models/Seat_belts.obj' },
-            { mtl: 'models/Canopy_edge.mtl', obj: 'models/Canopy_edge.obj' },
-            { mtl: 'models/Joystick.mtl', obj: 'models/Joystick.obj' },
-            { mtl: 'models/Throttle.mtl', obj: 'models/Throttle.obj' },
-            { mtl: 'models/Display.mtl', obj: 'models/Display.obj' },
-            { mtl: 'models/Skids.mtl', obj: 'models/Skids.obj' },
-            { mtl: 'models/Arm_fwd.mtl', obj: 'models/Arm_fwd.obj' },
-            { mtl: 'models/Arm_aft.mtl', obj: 'models/Arm_aft.obj' },
-            { mtl: 'models/Motor_support_fwd.mtl', obj: 'models/Motor_support_fwd.obj' },
-            { mtl: 'models/Motor_support_Aft.mtl', obj: 'models/Motor_support_Aft.obj' },
-            { mtl: 'models/Motors_fwd.mtl', obj: 'models/Motors_fwd.obj' },
-            { mtl: 'models/Motors_aft.mtl', obj: 'models/Motors_aft.obj' },
-            { mtl: 'models/Propellers_fwd.mtl', obj: 'models/Propellers_fwd.obj' },
-            { mtl: 'models/Propeller_aft.mtl', obj: 'models/Propeller_aft.obj' },
-            { mtl: 'models/Propeller_plate_fwd.mtl', obj: 'models/Propeller_plate_fwd.obj' },
-            { mtl: 'models/Propeller_plate_aft.mtl', obj: 'models/Propeller_plate_aft.obj' },
-            { mtl: 'models/Support_duct_fwd.mtl', obj: 'models/Support_duct_fwd.obj' },
-            { mtl: 'models/Support_duct_aft.mtl', obj: 'models/Support_duct_aft.obj' },
-            { mtl: 'models/Duct_holder_fwd.mtl', obj: 'models/Duct_holder_fwd.obj' },
-            { mtl: 'models/Duct_holder_aft.mtl', obj: 'models/Duct_holder_aft.obj' },
-            { mtl: 'models/Ducts_top_fwd.mtl', obj: 'models/Ducts_top_fwd.obj' },
-            { mtl: 'models/Ducts_top_aft.mtl', obj: 'models/Ducts_top_aft.obj' },
-            { mtl: 'models/Ducts_bottom_fwd.mtl', obj: 'models/Ducts_bottom_fwd.obj' },
-            { mtl: 'models/Ducts_bottom_aft.mtl', obj: 'models/Ducts_bottom_aft.obj' },
-        ];
+    // List of initial parts to load and display immediately
+    const initialParts = [
+        { mtl: 'models/Mono.mtl', obj: 'models/Mono.obj' },
+        { mtl: 'models/Front_cover.mtl', obj: 'models/Front_cover.obj' },
+        { mtl: 'models/Rear_cover.mtl', obj: 'models/Rear_cover.obj' }
+    ];        
+        
+    // List of remaining parts to load and display together
+    const remainingParts = [
+        { mtl: 'models/Seat.mtl', obj: 'models/Seat.obj' },
+        { mtl: 'models/Roll_hoop.mtl', obj: 'models/Roll_hoop.obj' },
+        { mtl: 'models/Roll_hoop_cover.mtl', obj: 'models/Roll_hoop_cover.obj' },
+        { mtl: 'models/Side_cover_top_l.mtl', obj: 'models/Side_cover_top_l.obj' },
+        { mtl: 'models/Side_cover_r.mtl', obj: 'models/Side_cover_r.obj' },
+        { mtl: 'models/Side_cover_bottom_l.mtl', obj: 'models/Side_cover_bottom_l.obj' },
+        { mtl: 'models/Seat_belts.mtl', obj: 'models/Seat_belts.obj' },
+        { mtl: 'models/Canopy_edge.mtl', obj: 'models/Canopy_edge.obj' },
+        { mtl: 'models/Joystick.mtl', obj: 'models/Joystick.obj' },
+        { mtl: 'models/Throttle.mtl', obj: 'models/Throttle.obj' },
+        { mtl: 'models/Display.mtl', obj: 'models/Display.obj' },
+        { mtl: 'models/Skids.mtl', obj: 'models/Skids.obj' },
+        { mtl: 'models/Arm_fwd.mtl', obj: 'models/Arm_fwd.obj' },
+        { mtl: 'models/Arm_aft.mtl', obj: 'models/Arm_aft.obj' },
+        { mtl: 'models/Motor_support_fwd.mtl', obj: 'models/Motor_support_fwd.obj' },
+        { mtl: 'models/Motor_support_Aft.mtl', obj: 'models/Motor_support_Aft.obj' },
+        { mtl: 'models/Motors_fwd.mtl', obj: 'models/Motors_fwd.obj' },
+        { mtl: 'models/Motors_aft.mtl', obj: 'models/Motors_aft.obj' },
+        { mtl: 'models/Propellers_fwd.mtl', obj: 'models/Propellers_fwd.obj' },
+        { mtl: 'models/Propeller_aft.mtl', obj: 'models/Propeller_aft.obj' },
+        { mtl: 'models/Propeller_plate_fwd.mtl', obj: 'models/Propeller_plate_fwd.obj' },
+        { mtl: 'models/Propeller_plate_aft.mtl', obj: 'models/Propeller_plate_aft.obj' },
+        { mtl: 'models/Support_duct_fwd.mtl', obj: 'models/Support_duct_fwd.obj' },
+        { mtl: 'models/Support_duct_aft.mtl', obj: 'models/Support_duct_aft.obj' },
+        { mtl: 'models/Duct_holder_fwd.mtl', obj: 'models/Duct_holder_fwd.obj' },
+        { mtl: 'models/Duct_holder_aft.mtl', obj: 'models/Duct_holder_aft.obj' },
+        { mtl: 'models/Ducts_top_fwd.mtl', obj: 'models/Ducts_top_fwd.obj' },
+        { mtl: 'models/Ducts_top_aft.mtl', obj: 'models/Ducts_top_aft.obj' },
+        { mtl: 'models/Ducts_bottom_fwd.mtl', obj: 'models/Ducts_bottom_fwd.obj' },
+        { mtl: 'models/Ducts_bottom_aft.mtl', obj: 'models/Ducts_bottom_aft.obj' },
+        { mtl: 'models/Part2.mtl', obj: 'models/Part2.obj' },
+        { mtl: 'models/Part2.mtl', obj: 'models/Part2.obj' },
+        { mtl: 'models/Part2.mtl', obj: 'models/Part2.obj' },
+        { mtl: 'models/Part2.mtl', obj: 'models/Part2.obj' },
+        { mtl: 'models/Part2.mtl', obj: 'models/Part2.obj' },
+        { mtl: 'models/Part2.mtl', obj: 'models/Part2.obj' },
+        { mtl: 'models/Part2.mtl', obj: 'models/Part2.obj' }
+    ];
 
         /*
         loadModel('models/Front_cover.mtl', 'models/Front_cover.obj', {x: 0, y: 0, z: 0});
@@ -265,22 +254,24 @@
         loadModel('models/Part2.mtl', 'models/Part2.obj', {x: 0, y: 0, z: 0});
 
         loadModel('models/Mono.mtl', 'models/Mono.obj', {x: 0, y: 0, z: 0});  
-*/
+        */
 
-        // Load Mono.obj first and display it immediately
-        loadModel('models/Mono.mtl', 'models/Mono.obj', {x: 0, y: 0, z: 0}).then((monoObject) => {
-            scene.add(monoObject);
-            console.log('Mono.obj added to scene');
+        // Load initial parts (Mono, Front_cover, Rear_cover) and display each as it's ready
+        initialParts.forEach(part => {
+            loadModel(part.mtl, part.obj, {x: 0, y: 0, z: 0}).then((object) => {
+                scene.add(object);
+                console.log(`${part.obj} added to scene`);
 
-            // Compute bounding box after loading Mono
-            objectBoundingBox = new THREE.Box3().setFromObject(monoObject);
-            objectCenter = objectBoundingBox.getCenter(new THREE.Vector3());
-
-            // Set initial camera position
-            camera.position.set(0, -1.5, 1.5);
-            camera.lookAt(objectCenter);
-        }).catch((error) => {
-            console.error('Failed to load Mono.obj:', error);
+                // Compute bounding box after loading the first part (Mono) for initial camera setup
+                if (part.obj === 'models/Mono.obj') {
+                objectBoundingBox = new THREE.Box3().setFromObject(object);
+                objectCenter = objectBoundingBox.getCenter(new THREE.Vector3());
+                camera.position.set(0, -1.5, 1.5);
+                camera.lookAt(objectCenter);
+                }
+            }).catch((error) => {
+                console.error(`Failed to load ${part.obj}:`, error);
+            });
         });
 
         // Load all remaining parts and add them only when all are ready
@@ -297,9 +288,6 @@
             console.error('Failed to load remaining parts:', error);
         });
 
-
-
-        
       // Add TrackballControls for unrestricted rotation
         const controls = new THREE.TrackballControls(camera, renderer.domElement);
         controls.rotateSpeed = 2.5;    // Speed of rotation
