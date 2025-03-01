@@ -131,9 +131,10 @@
         
         // Function to load a model with MTL and OBJ
         function loadModel(mtlPath, objPath, position = {x: 0, y: 0, z: 0}) {
-            const mtlLoader = new THREE.MTLLoader();
-            mtlLoader.load(
-                mtlPath,
+            return new Promise((resolve, reject) => {
+                const mtlLoader = new THREE.MTLLoader();
+                mtlLoader.load(
+                    mtlPath,
                     function (materials) {
                     materials.preload();
                     const objLoader = new THREE.OBJLoader();
@@ -142,30 +143,26 @@
                         objPath,
                         function (object) {
                             object.position.set(position.x, position.y, position.z);
-                            object.scale.set(0.004, 0.004, 0.004); // Consistent scale
-                            scene.add(object);
-
-                            // Compute bounding box after loading
-                            objectBoundingBox = new THREE.Box3().setFromObject(object);
-                            objectSize = objectBoundingBox.getSize(new THREE.Vector3());
-                            objectCenter = objectBoundingBox.getCenter(new THREE.Vector3());
-
-                            // Set initial camera position (optional, will be overridden dynamically)
-                            camera.position.set(0, -1.5, 1.5);
-                            camera.lookAt(objectCenter);
-
-                            console.log(`Loaded ${objPath} with size:`, objectSize, `center:`, objectCenter);
+                            object.scale.set(0.004, 0.004, 0.004);
+                            resolve(object); // Resolve with the loaded object
                         },
                         function (xhr) {
                             console.log(`${objPath}: ${(xhr.loaded / xhr.total * 100)}% loaded`);
                         },
                         function (error) {
                             console.error(`Error loading ${objPath}:`, error);
+                            reject(error);
                         }
                     );
+                },
+                undefined,
+                function (error) {
+                    console.error(`Error loading ${mtlPath}:`, error);
+                    reject(error);
                 }
             );
-        }
+        });
+    }
 /* 
                     console.log(`${objPath} loaded successfully at position:`, position);
                     
@@ -190,8 +187,43 @@
                             
 
 
-        // Load multiple models to form an assembly
-        loadModel('models/Mono.mtl', 'models/Mono.obj', {x: 0, y: 0, z: 0});
+        // List of remaining parts to load
+        const remainingParts = [
+            { mtl: 'models/Front_cover.mtl', obj: 'models/Front_cover.obj' },
+            { mtl: 'models/Rear_cover.mtl', obj: 'models/Rear_cover.obj' },
+            { mtl: 'models/Seat.mtl', obj: 'models/Seat.obj' },
+            { mtl: 'models/Roll_hoop.mtl', obj: 'models/Roll_hoop.obj' },
+            { mtl: 'models/Roll_hoop_cover.mtl', obj: 'models/Roll_hoop_cover.obj' },
+            { mtl: 'models/Side_cover_top_l.mtl', obj: 'models/Side_cover_top_l.obj' },
+            { mtl: 'models/Side_cover_r.mtl', obj: 'models/Side_cover_r.obj' },
+            { mtl: 'models/Side_cover_bottom_l.mtl', obj: 'models/Side_cover_bottom_l.obj' },
+            { mtl: 'models/Seat_belts.mtl', obj: 'models/Seat_belts.obj' },
+            { mtl: 'models/Canopy_edge.mtl', obj: 'models/Canopy_edge.obj' },
+            { mtl: 'models/Joystick.mtl', obj: 'models/Joystick.obj' },
+            { mtl: 'models/Throttle.mtl', obj: 'models/Throttle.obj' },
+            { mtl: 'models/Display.mtl', obj: 'models/Display.obj' },
+            { mtl: 'models/Skids.mtl', obj: 'models/Skids.obj' },
+            { mtl: 'models/Arm_fwd.mtl', obj: 'models/Arm_fwd.obj' },
+            { mtl: 'models/Arm_aft.mtl', obj: 'models/Arm_aft.obj' },
+            { mtl: 'models/Motor_support_fwd.mtl', obj: 'models/Motor_support_fwd.obj' },
+            { mtl: 'models/Motor_support_Aft.mtl', obj: 'models/Motor_support_Aft.obj' },
+            { mtl: 'models/Motors_fwd.mtl', obj: 'models/Motors_fwd.obj' },
+            { mtl: 'models/Motors_aft.mtl', obj: 'models/Motors_aft.obj' },
+            { mtl: 'models/Propellers_fwd.mtl', obj: 'models/Propellers_fwd.obj' },
+            { mtl: 'models/Propeller_aft.mtl', obj: 'models/Propeller_aft.obj' },
+            { mtl: 'models/Propeller_plate_fwd.mtl', obj: 'models/Propeller_plate_fwd.obj' },
+            { mtl: 'models/Propeller_plate_aft.mtl', obj: 'models/Propeller_plate_aft.obj' },
+            { mtl: 'models/Support_duct_fwd.mtl', obj: 'models/Support_duct_fwd.obj' },
+            { mtl: 'models/Support_duct_aft.mtl', obj: 'models/Support_duct_aft.obj' },
+            { mtl: 'models/Duct_holder_fwd.mtl', obj: 'models/Duct_holder_fwd.obj' },
+            { mtl: 'models/Duct_holder_aft.mtl', obj: 'models/Duct_holder_aft.obj' },
+            { mtl: 'models/Ducts_top_fwd.mtl', obj: 'models/Ducts_top_fwd.obj' },
+            { mtl: 'models/Ducts_top_aft.mtl', obj: 'models/Ducts_top_aft.obj' },
+            { mtl: 'models/Ducts_bottom_fwd.mtl', obj: 'models/Ducts_bottom_fwd.obj' },
+            { mtl: 'models/Ducts_bottom_aft.mtl', obj: 'models/Ducts_bottom_aft.obj' },
+        ];
+
+        /*
         loadModel('models/Front_cover.mtl', 'models/Front_cover.obj', {x: 0, y: 0, z: 0});
         loadModel('models/Rear_cover.mtl', 'models/Rear_cover.obj', {x: 0, y: 0, z: 0});
         loadModel('models/Seat.mtl', 'models/Seat.obj', {x: 0, y: 0, z: 0});
@@ -232,9 +264,42 @@
         loadModel('models/Part2.mtl', 'models/Part2.obj', {x: 0, y: 0, z: 0});
         loadModel('models/Part2.mtl', 'models/Part2.obj', {x: 0, y: 0, z: 0});
 
-                
+        loadModel('models/Mono.mtl', 'models/Mono.obj', {x: 0, y: 0, z: 0});  
+*/
+
+        // Load Mono.obj first and display it immediately
+        loadModel('models/Mono.mtl', 'models/Mono.obj', {x: 0, y: 0, z: 0}).then((monoObject) => {
+            scene.add(monoObject);
+            console.log('Mono.obj added to scene');
+
+            // Compute bounding box after loading Mono
+            objectBoundingBox = new THREE.Box3().setFromObject(monoObject);
+            objectCenter = objectBoundingBox.getCenter(new THREE.Vector3());
+
+            // Set initial camera position
+            camera.position.set(0, -1.5, 1.5);
+            camera.lookAt(objectCenter);
+        }).catch((error) => {
+            console.error('Failed to load Mono.obj:', error);
+        });
+
+        // Load all remaining parts and add them only when all are ready
+        Promise.all(remainingParts.map(part => 
+            loadModel(part.mtl, part.obj, {x: 0, y: 0, z: 0})
+        )).then((loadedParts) => {
+            loadedParts.forEach(part => scene.add(part));
+            console.log('All remaining parts added to scene');
+
+            // Update bounding box to include all parts
+            objectBoundingBox = new THREE.Box3().setFromObject(scene);
+            objectCenter = objectBoundingBox.getCenter(new THREE.Vector3());
+        }).catch((error) => {
+            console.error('Failed to load remaining parts:', error);
+        });
 
 
+
+        
       // Add TrackballControls for unrestricted rotation
         const controls = new THREE.TrackballControls(camera, renderer.domElement);
         controls.rotateSpeed = 2.5;    // Speed of rotation
