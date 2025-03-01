@@ -5,21 +5,6 @@ html, body {
     overflow-x: hidden;
 }
 
-@font-face {
-    font-family: 'FORMULA1-REGULAR';
-    src: url('FORMULA1-REGULAR.OTF') format('opentype');
-}
-
-@font-face {
-    font-family: 'FORMULA1-WIDE';
-    src: url('FORMULA1-WIDE.OTF') format('opentype');
-}
-
-@font-face {
-    font-family: 'FORMULA1-BOLD';
-    src: url('FORMULA1-BOLD.OTF') format('opentype');
-}
-
 #grid-container {
     display: grid;
     grid-template-areas:
@@ -51,7 +36,7 @@ html, body {
 }
 
 #header-box:hover {
-    background-color: #d3d3d3; /* Light orange (peachpuff) on hover */
+    background-color: #d3d3d3;
 }
 
 #logo {
@@ -66,7 +51,6 @@ html, body {
 }
 
 .header-button {
-    font-family: 'FORMULA1-REGULAR', sans-serif;
     font-size: 16px;
     padding: 10px 20px;
     background-color: #333333;
@@ -74,7 +58,8 @@ html, body {
     cursor: pointer;
     text-align: center;
     border-radius: 8px;
-    transition: background-color 0.3s ease; /* Only background changes */
+    transition: background-color 0.3s ease;
+    border: none; /* Remove default button border */
 }
 
 .header-button:hover {
@@ -86,7 +71,6 @@ html, body {
     grid-area: top-text;
     text-align: center;
     padding: 20px 0;
-    font-family: 'FORMULA1-WIDE', sans-serif;
     font-size: 40px;
     color: #DF4949;
 }
@@ -94,7 +78,6 @@ html, body {
 #left-text {
     grid-area: left-text;
     padding: 20px;
-    font-family: 'FORMULA1-REGULAR', sans-serif;
     font-size: 18px;
     color: #595959;
 }
@@ -110,7 +93,6 @@ html, body {
 #right-text {
     grid-area: right-text;
     padding: 20px;
-    font-family: 'FORMULA1-REGULAR', sans-serif;
     font-size: 18px;
     color: #595959;
 }
@@ -119,11 +101,10 @@ html, body {
     grid-area: bottom-text;
     text-align: center;
     padding: 20px 0;
-    font-family: 'FORMULA1-REGULAR', sans-serif;
     font-size: 18px;
     color: #7F7F7F;
-    position: sticky; /* Stick to bottom */
+    position: sticky;
     bottom: 0;
-    background-color: #ffffff; /* Ensure visibility */
+    background-color: #ffffff;
     z-index: 5;
 }
