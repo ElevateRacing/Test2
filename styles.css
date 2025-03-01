@@ -27,16 +27,16 @@ body {
     flex-direction: column;
     width: 100%;
     max-width: 100%;
-    padding: 10px;
+    padding: 5px;
     box-sizing: border-box;
 }
 
 #header-box {
     background-color: #d3d3d3; /* Light grey */
-    margin: 10px; /* Small distance from top */
+    margin-top: 5px; /* Small distance from top */
     margin-left: 15px; /* Bigger left margin */
     margin-right: 15px; /* Bigger right margin */
-    padding: 10px;
+    padding: 5px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -65,20 +65,21 @@ body {
     font-family: 'FORMULA1-REGULAR', sans-serif;
     font-size: 16px;
     padding: 10px 20px;
-    background-color: #ffffff;
-    border: 2px solid #404040; /* Squared edges */
-    color: #404040;
+    background-color: #333333;
+    border: 2px solid #333333; /* Squared edges */
+    color: #ffffff;
     cursor: pointer;
     text-align: center;
+    border-radius: 8px;
     transition: background-color 0.3s ease; /* Only background changes */
 }
 
 .header-button:hover {
-    background-color: #f0f0f0;
+    background-color: #4d4d4d;
+    color: #ffffff;
 }
 
 #canvas-container {
-    grid-area: canvas;
     height: 400px;
     width: 100%;
     box-sizing: border-box;
