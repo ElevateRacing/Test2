@@ -124,25 +124,51 @@
         pointLight.position.set(0, 5, 5);
         scene.add(pointLight);
 
+        // Variables to store object bounds
+        let objectBoundingBox = null;
+        let objectCenter = new THREE.Vector3();
+        let objectSize = new THREE.Vector3();
+        
         // Function to load a model with MTL and OBJ
         function loadModel(mtlPath, objPath, position = {x: 0, y: 0, z: 0}) {
-    const mtlLoader = new THREE.MTLLoader();
-    mtlLoader.load(
-        mtlPath,
-        function (materials) {
-            materials.preload();
+            const mtlLoader = new THREE.MTLLoader();
+            mtlLoader.load(
+                mtlPath,
+                    function (materials) {
+                    materials.preload();
+                    const objLoader = new THREE.OBJLoader();
+                    objLoader.setMaterials(materials);
+                    objLoader.load(
+                        objPath,
+                        function (object) {
+                            object.position.set(position.x, position.y, position.z);
+                            object.scale.set(0.004, 0.004, 0.004); // Consistent scale
+                            scene.add(object);
 
-            const objLoader = new THREE.OBJLoader();
-            objLoader.setMaterials(materials);
-            objLoader.load(
-                objPath,
-                function (object) {
-                    object.position.set(position.x, position.y, position.z);
-                    object.scale.set(0.004, 0.004, 0.004); // Consistent scale
-                    scene.add(object);
+                            // Compute bounding box after loading
+                            objectBoundingBox = new THREE.Box3().setFromObject(object);
+                            objectSize = objectBoundingBox.getSize(new THREE.Vector3());
+                            objectCenter = objectBoundingBox.getCenter(new THREE.Vector3());
 
+                            // Set initial camera position (optional, will be overridden dynamically)
+                            camera.position.set(0, -1.5, 1.5);
+                            camera.lookAt(objectCenter);
+
+                            console.log(`Loaded ${objPath} with size:`, objectSize, `center:`, objectCenter);
+                        },
+                        function (xhr) {
+                            console.log(`${objPath}: ${(xhr.loaded / xhr.total * 100)}% loaded`);
+                        },
+                        function (error) {
+                            console.error(`Error loading ${objPath}:`, error);
+                        }
+                    );
+                }
+            );
+        }
+/* 
                     console.log(`${objPath} loaded successfully at position:`, position);
-
+                    
                     // Apply Giallo Modena only to Powder_Coat_(Red) parts of Mono.obj
                     if (objPath === 'Mono.obj') {
                         object.traverse(child => {
@@ -160,23 +186,9 @@
                             }
                         });
                     }
-                },
-                function (xhr) {
-                    console.log(`${objPath}: ${(xhr.loaded / xhr.total * 100)}% loaded`);
-                },
-                function (error) {
-                    console.error(`Error loading ${objPath}:`, error);
-                }
-            );
-        },
-        function (xhr) {
-            console.log(`${mtlPath}: ${(xhr.loaded / xhr.total * 100)}% loaded`);
-        },
-        function (error) {
-            console.error(`Error loading ${mtlPath}:`, error);
-        }
-    );
-}
+*/  
+                            
+
 
         // Load multiple models to form an assembly
         loadModel('models/Mono.mtl', 'models/Mono.obj', {x: 0, y: 0, z: 0});
@@ -222,10 +234,6 @@
 
                 
 
-        // Position the camera
-        //camera.position.z = 1.5;
-        camera.position.set(0,-1.5,1.5);
-        camera.lookAt(0,0,0);
 
       // Add TrackballControls for unrestricted rotation
         const controls = new THREE.TrackballControls(camera, renderer.domElement);
@@ -258,11 +266,38 @@
 
         // Animation loop
         function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-            renderer.clear();
-            renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+    controls.update(); // Apply user input
+
+    if (objectBoundingBox) {
+        // Calculate ideal distance to fit object in view
+        const maxDim = Math.max(objectSize.x, objectSize.y, objectSize.z);
+        const fov = camera.fov * (Math.PI / 180); // FOV in radians
+        const minDistance = maxDim / (2 * Math.tan(fov / 2)) * 1.2; // Fit with padding
+
+        // Get current camera direction from controls
+        const direction = new THREE.Vector3();
+        camera.getWorldDirection(direction); // Direction camera is facing
+
+        // Current distance from camera to object center
+        const currentDistance = camera.position.distanceTo(objectCenter);
+
+        // Adjust distance if too close or too far
+        if (currentDistance < minDistance) {
+            const offset = direction.clone().multiplyScalar(minDistance);
+            camera.position.copy(objectCenter).add(offset);
+        } else if (currentDistance > minDistance * 3) { // Optional max distance
+            const offset = direction.clone().multiplyScalar(minDistance * 1.5);
+            camera.position.copy(objectCenter).add(offset);
         }
+
+        // Ensure camera looks at the object center
+        camera.lookAt(objectCenter);
+    }
+
+    renderer.clear();
+    renderer.render(scene, camera);
+}
         animate();
         </script>
 </body>
