@@ -19,17 +19,11 @@ body {
     src: url('FORMULA1-BOLD.OTF') format('opentype');
 }
 
-#wrapper {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 100%;
-    margin: 0 auto; /* Centers the wrapper horizontally, no vertical margin */
-    padding: 5px;
-    box-sizing: border-box;
-}
-
 #header-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
     background-color: #d3d3d3; /* Light grey */
     margin-top: 5px; /* Small distance from top */
     margin-left: 15px; /* Bigger left margin */
@@ -76,7 +70,14 @@ body {
     background-color: #4d4d4d;
     color: #ffffff;
 }
-
+#wrapper {
+    margin-top: 80px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto; /* Centers the wrapper horizontally, no vertical margin */
+    padding: 5px;
+    box-sizing: border-box;
+}
 #canvas-container {
     height: 400px;
     width: 100%;
