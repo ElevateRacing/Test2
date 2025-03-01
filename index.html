@@ -126,48 +126,56 @@
 
         // Function to load a model with MTL and OBJ
         function loadModel(mtlPath, objPath, position = {x: 0, y: 0, z: 0}) {
-            const mtlLoader = new THREE.MTLLoader();
-            mtlLoader.load(
-                mtlPath,
-                function (materials) {
-                    materials.preload();
+    const mtlLoader = new THREE.MTLLoader();
+    mtlLoader.load(
+        mtlPath,
+        function (materials) {
+            materials.preload();
 
-                    const objLoader = new THREE.OBJLoader();
-                    objLoader.setMaterials(materials);
-                    objLoader.load(
-                        objPath,
-                        function (object) {
-                            object.position.set(position.x, position.y, position.z);
-                            object.scale.set(0.004, 0.004, 0.004); // Consistent scale
-                            scene.add(object);
+            const objLoader = new THREE.OBJLoader();
+            objLoader.setMaterials(materials);
+            objLoader.load(
+                objPath,
+                function (object) {
+                    object.position.set(position.x, position.y, position.z);
+                    object.scale.set(0.004, 0.004, 0.004); // Consistent scale
+                    scene.add(object);
 
-                            console.log(`${objPath} loaded successfully at position:`, position);
+                    console.log(`${objPath} loaded successfully at position:`, position);
 
-                            // Add environment map to enhance .mtl materials
-                            object.traverse(child => {
-                                if (child.isMesh && child.material) {
-                                    child.material.envMap = scene.environment;
-                                    child.material.envMapIntensity = 3.0; // Adjust intensity as needed
-                                    child.material.needsUpdate = true;
-                                }
-                            });
-                        },
-                        function (xhr) {
-                            console.log(`${objPath}: ${(xhr.loaded / xhr.total * 100)}% loaded`);
-                        },
-                        function (error) {
-                            console.error(`Error loading ${objPath}:`, error);
-                        }
-                    );
+                    // Replace material for Mono.obj specifically
+                    if (objPath === 'Mono.obj') {
+                        object.traverse(child => {
+                            if (child.isMesh && child.material.name === 'Powder_Coat_(Red)') {
+                                const pbrMaterial = new THREE.MeshStandardMaterial({
+                                    color: 0xff2800,        // Ferrari red (RGB 255, 40, 0)
+                                    metalness: 0.2,         // Slightly metallic for powder coat realism
+                                    roughness: 0.3,         // Smooth but not mirror-like
+                                    envMap: scene.environment, // Use HDRI for reflections
+                                    envMapIntensity: 3.0    // Strong reflections
+                                });
+                                child.material = pbrMaterial;
+                                child.material.needsUpdate = true;
+                            }
+                        });
+                    }
                 },
                 function (xhr) {
-                    console.log(`${mtlPath}: ${(xhr.loaded / xhr.total * 100)}% loaded`);
+                    console.log(`${objPath}: ${(xhr.loaded / xhr.total * 100)}% loaded`);
                 },
                 function (error) {
-                    console.error(`Error loading ${mtlPath}:`, error);
+                    console.error(`Error loading ${objPath}:`, error);
                 }
             );
+        },
+        function (xhr) {
+            console.log(`${mtlPath}: ${(xhr.loaded / xhr.total * 100)}% loaded`);
+        },
+        function (error) {
+            console.error(`Error loading ${mtlPath}:`, error);
         }
+    );
+}
 
         // Load multiple models to form an assembly
         loadModel('Mono.mtl', 'Mono.obj', {x: 0, y: 0, z: 0});
