@@ -53,15 +53,112 @@
             container.appendChild(renderer.domElement);
         }
 
-        // Add a simple cube as a test object
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); // Green cube
-        const cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
+        // Add coordinate axes
+        //const axesHelper = new THREE.AxesHelper(1); // Size of 1 unit
+        //scene.add(axesHelper);
 
-        // Position camera
-        camera.position.set(0, 0, 5);
-        camera.lookAt(0, 0, 0);
+        // Load HDRI environment map
+        const rgbeLoader = new THREE.RGBELoader();
+        rgbeLoader.load(
+            'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/autumn_field_1k.hdr', // Example HDRI from Poly Haven
+            function (texture) {
+                texture.mapping = THREE.EquirectangularReflectionMapping; // Required for HDRI
+                scene.environment = texture; // Apply to materials for reflections
+                // scene.background = texture; // Uncomment to set as background (optional)
+                console.log('HDRI environment loaded successfully!');
+            },
+            undefined,
+            function (error) {
+                console.error('Error loading HDRI:', error);
+            }
+        );
+
+        // Add ambient lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 2.0);
+        scene.add(ambientLight);
+
+        // Add directional lighting
+        const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.4);
+        directionalLight1.position.set(5, 10, 5);
+        scene.add(directionalLight1);
+        // Add helper to visualize the directional light
+        //const lightHelper1 = new THREE.DirectionalLightHelper(directionalLight1, 1); // Size of helper = 1 unit
+        //scene.add(lightHelper1);
+
+        const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.6);
+        directionalLight2.position.set(-5, 5, -5);
+        scene.add(directionalLight2);
+        // Add helper to visualize the directional light
+        //const lightHelper2 = new THREE.DirectionalLightHelper(directionalLight2, 1); // Size of helper = 1 unit
+        //scene.add(lightHelper2);
+
+        const directionalLight3 = new THREE.DirectionalLight(0xffffff, 0.3);
+        directionalLight3.position.set(0, -5, 5);
+        scene.add(directionalLight3);
+        // Add helper to visualize the directional light
+        //const lightHelper3 = new THREE.DirectionalLightHelper(directionalLight3, 1); // Size of helper = 1 unit
+        //scene.add(lightHelper3);
+
+        const pointLight = new THREE.PointLight(0xffffff, 0.3, 50);
+        pointLight.position.set(0, 5, 5);
+        scene.add(pointLight);
+
+        // Load model function
+        function loadModel(mtlPath, objPath) {
+            return new Promise((resolve, reject) => {
+                const mtlLoader = new THREE.MTLLoader();
+                mtlLoader.load(
+                    mtlPath,
+                    (materials) => {
+                        materials.preload();
+                        const objLoader = new THREE.OBJLoader();
+                        objLoader.setMaterials(materials);
+                        objLoader.load(
+                            objPath,
+                            (object) => {
+                                // Adjust scale (your original was 0.004, adjust as needed)
+                                object.scale.set(0.004, 0.004, 0.004);
+                                // Center the object
+                                const box = new THREE.Box3().setFromObject(object);
+                                const center = box.getCenter(new THREE.Vector3());
+                                object.position.sub(center); // Move to origin
+                                resolve(object);
+                            },
+                            (xhr) => {
+                                console.log(`${objPath}: ${(xhr.loaded / xhr.total * 100)}% loaded`);
+                            },
+                            reject
+                        );
+                    },
+                    undefined,
+                    reject
+                );
+            });
+        }
+
+        // Load and add the Mono model
+        loadModel('models/Mono.mtl', 'models/Mono.obj')
+            .then((object) => {
+                scene.add(object);
+                console.log('Mono model loaded and added to scene:', object);
+
+                // Adjust camera based on model size
+                const box = new THREE.Box3().setFromObject(object);
+                const size = box.getSize(new THREE.Vector3());
+                const maxDim = Math.max(size.x, size.y, size.z);
+                camera.position.set(0, 0, maxDim * 2); // Move camera back based on size
+                camera.lookAt(0, 0, 0);
+            })
+            .catch((error) => {
+                console.error('Error loading Mono model:', error);
+                // Fallback: Add a cube if model fails
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                const material = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red cube
+                const cube = new THREE.Mesh(geometry, material);
+                scene.add(cube);
+                camera.position.set(0, 0, 5);
+                camera.lookAt(0, 0, 0);
+            });
 
         // Handle window resize
         function resizeRenderer() {
@@ -77,8 +174,7 @@
         // Animation loop
         function animate() {
             requestAnimationFrame(animate);
-            cube.rotation.x += 0.01; // Rotate cube
-            cube.rotation.y += 0.01;
+            scene.rotation.y += 0.005; // Rotate the entire scene slowly
             renderer.render(scene, camera);
         }
         animate();
