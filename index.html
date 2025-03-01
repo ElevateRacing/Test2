@@ -264,13 +264,38 @@
             if (element) observer.observe(element, { childList: true, subtree: true, characterData: true });
         });
 
+        // Flag to control rotation
+        let isRotating = true;
+
+        // Event listeners for mouse and touch to stop rotation
+        renderer.domElement.addEventListener('mousedown', (event) => {
+            if (event.button === 0) { // Left mouse button
+                isRotating = false;
+            }
+        });
+
+        renderer.domElement.addEventListener('touchstart', () => {
+            isRotating = false;
+        });
+
+        // Optional: Resume rotation when interaction ends
+        renderer.domElement.addEventListener('mouseup', () => {
+            isRotating = true;
+        });
+
+        renderer.domElement.addEventListener('touchend', () => {
+            isRotating = true;
+        });
+        
         // Animation loop
         function animate() {
             requestAnimationFrame(animate);
             controls.update(); // Apply user input
 
             // Rotate the entire scene slowly around the Z-axis
-            scene.rotation.z += 0.005; // Adjust this value for rotation speed (radians per frame)
+            if (isRotating) {
+            scene.rotation.z += 0.003; // Adjust this value for rotation speed
+            }
 
             renderer.clear();
             renderer.render(scene, camera);
