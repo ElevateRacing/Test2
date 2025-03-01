@@ -40,7 +40,7 @@
         const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000); //Reduce FOV from 75 to 45
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 
-        renderer.setClearColor(0xffffff, 1);
+        renderer.setClearColor(0xd3d3d3, 1);
         //renderer.autoClear = true;
         renderer.toneMapping = THREE.ACESFilmicToneMapping; // Better color/contrast
         renderer.toneMappingExposure = 0.9; // Adjust exposure
@@ -275,6 +275,7 @@
             }
             objectBoundingBox = new THREE.Box3().setFromObject(scene);
             objectCenter = objectBoundingBox.getCenter(new THREE.Vector3());
+            resizeRenderer();
         }).catch((error) => {
             console.error('Unexpected error in Promise.all:', error);
         });
