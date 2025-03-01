@@ -41,14 +41,14 @@ body {
 #header-box {
     grid-area: header;
     background-color: #d3d3d3; /* Light grey */
-    margin-top: 10px; /* Small distance from top */
-    margin-left: 10px; /* Bigger left margin */
-    margin-right: 10px; /* Bigger right margin */
+    margin: 10px; /* Small distance from top */
+    margin-left: 15px; /* Bigger left margin */
+    margin-right: 15px; /* Bigger right margin */
     padding: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-radius: 10px; /* Rounded edges */
+    border-radius: 15px; /* Rounded edges */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Small shadow at bottom */
     box-sizing: border-box;
     width: auto;
@@ -137,7 +137,7 @@ body {
 
 #canvas-container {
     grid-area: canvas;
-    height: 600px;
+    height: 400px;
     width: 100%;
     box-sizing: border-box;
 }
