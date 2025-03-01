@@ -37,312 +37,48 @@
     <script>
         // Scene, camera, and renderer setup
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000); //Reduce FOV from 75 to 45
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000); //Reduce FOV from 75 to 45
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
         renderer.setClearColor(0xd3d3d3, 1);
-        //renderer.autoClear = true;
+        
         renderer.toneMapping = THREE.ACESFilmicToneMapping; // Better color/contrast
         renderer.toneMappingExposure = 0.9; // Adjust exposure
         renderer.physicallyCorrectLights = true; // Realistic light falloff
         
         const container = document.getElementById('canvas-container');
-        const leftText = document.getElementById('left-text');
-        const rightText = document.getElementById('right-text');
-        const topText = document.getElementById('top-text');
-        const bottomText = document.getElementById('bottom-text');
-        const logo = document.getElementById('logo');
-        const wrapper = document.getElementById('wrapper');
-
-       if (!container) {
-            console.error('Canvas container not found! Add <div id="canvas-container"></div> to your HTML.');
+        if (!container) {
+            console.error('Canvas container not found!');
         } else {
             renderer.setSize(container.clientWidth, container.clientHeight);
             container.appendChild(renderer.domElement);
-        } 
-        
-        // Add coordinate axes
-        //const axesHelper = new THREE.AxesHelper(1); // Size of 1 unit
-        //scene.add(axesHelper);
-        
-        // Load HDRI environment map
-        const rgbeLoader = new THREE.RGBELoader();
-        rgbeLoader.load(
-            'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/autumn_field_1k.hdr', // Example HDRI from Poly Haven
-            function (texture) {
-                texture.mapping = THREE.EquirectangularReflectionMapping; // Required for HDRI
-                scene.environment = texture; // Apply to materials for reflections
-                // scene.background = texture; // Uncomment to set as background (optional)
-                console.log('HDRI environment loaded successfully!');
-            },
-            undefined,
-            function (error) {
-                console.error('Error loading HDRI:', error);
-            }
-        );
-
-        // Add ambient lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 2.0);
-        scene.add(ambientLight);
-
-        // Add directional lighting
-        const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.4);
-        directionalLight1.position.set(5, 10, 5);
-        scene.add(directionalLight1);
-
-        // Add helper to visualize the directional light
-        //const lightHelper1 = new THREE.DirectionalLightHelper(directionalLight1, 1); // Size of helper = 1 unit
-        //scene.add(lightHelper1);
-
-        const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.6);
-        directionalLight2.position.set(-5, 5, -5);
-        scene.add(directionalLight2);
-
-        // Add helper to visualize the directional light
-        //const lightHelper2 = new THREE.DirectionalLightHelper(directionalLight2, 1); // Size of helper = 1 unit
-        //scene.add(lightHelper2);
-
-        const directionalLight3 = new THREE.DirectionalLight(0xffffff, 0.3);
-        directionalLight3.position.set(0, -5, 5);
-        scene.add(directionalLight3);
-
-        // Add helper to visualize the directional light
-        //const lightHelper3 = new THREE.DirectionalLightHelper(directionalLight3, 1); // Size of helper = 1 unit
-        //scene.add(lightHelper3);
-
-        const pointLight = new THREE.PointLight(0xffffff, 0.3, 50);
-        pointLight.position.set(0, 5, 5);
-        scene.add(pointLight);
-
-        // Variables to store object bounds
-        let objectBoundingBox = null;
-        let objectCenter = new THREE.Vector3();
-        let objectSize = new THREE.Vector3();
-        
-        // Function to load a model with MTL and OBJ
-        function loadModel(mtlPath, objPath, position = {x: 0, y: 0, z: 0}) {
-            return new Promise((resolve, reject) => {
-                const mtlLoader = new THREE.MTLLoader();
-                mtlLoader.load(
-                    mtlPath,
-                    function (materials) {
-                        materials.preload();
-                        const objLoader = new THREE.OBJLoader();
-                        objLoader.setMaterials(materials);
-                        objLoader.load(
-                            objPath,
-                            function (object) {
-                                object.position.set(position.x, position.y, position.z);
-                                object.scale.set(0.004, 0.004, 0.004);
-                                console.log(`Successfully loaded ${objPath}`);
-                                resolve(object);
-                            },
-                            function (xhr) {
-                                console.log(`${objPath}: ${(xhr.loaded / xhr.total * 100)}% loaded`);
-                            },
-                            function (error) {
-                                console.error(`Error loading ${objPath}:`, error);
-                                reject(error);
-                            }
-                        );
-                    },
-                    undefined,
-                    function (error) {
-                        console.error(`Error loading ${mtlPath}:`, error);
-                        reject(error);
-                    }
-                );
-            });
         }
 
-        // List of initial parts to load and display immediately
-        const initialParts = [
-            { mtl: 'models/Mono.mtl', obj: 'models/Mono.obj' },
-            { mtl: 'models/Front_cover.mtl', obj: 'models/Front_cover.obj' },
-            { mtl: 'models/Rear_cover.mtl', obj: 'models/Rear_cover.obj' },
-            { mtl: 'models/Seat.mtl', obj: 'models/Seat.obj' },
-            { mtl: 'models/Roll_hoop.mtl', obj: 'models/Roll_hoop.obj' },
-            { mtl: 'models/Roll_hoop_cover.mtl', obj: 'models/Roll_hoop_cover.obj' },
-            { mtl: 'models/Side_cover_top_l.mtl', obj: 'models/Side_cover_top_l.obj' },
-            { mtl: 'models/Side_cover_r.mtl', obj: 'models/Side_cover_r.obj' },
-            { mtl: 'models/Side_cover_bottom_l.mtl', obj: 'models/Side_cover_bottom_l.obj' },
-            { mtl: 'models/Seat_belts.mtl', obj: 'models/Seat_belts.obj' },
-        ];        
-        
-        // List of remaining parts to load and display together
-        const remainingParts = [
-            { mtl: 'models/Canopy_edge.mtl', obj: 'models/Canopy_edge.obj' },
-            { mtl: 'models/Joystick.mtl', obj: 'models/Joystick.obj' },
-            { mtl: 'models/Throttle.mtl', obj: 'models/Throttle.obj' },
-            { mtl: 'models/Display.mtl', obj: 'models/Display.obj' },
-            { mtl: 'models/Skids.mtl', obj: 'models/Skids.obj' },
-            { mtl: 'models/Arm_fwd.mtl', obj: 'models/Arm_fwd.obj' },
-            { mtl: 'models/Arm_aft.mtl', obj: 'models/Arm_aft.obj' },
-            { mtl: 'models/Motor_support_fwd.mtl', obj: 'models/Motor_support_fwd.obj' },
-            { mtl: 'models/Motor_support_Aft.mtl', obj: 'models/Motor_support_Aft.obj' },
-            { mtl: 'models/Motors_fwd.mtl', obj: 'models/Motors_fwd.obj' },
-            { mtl: 'models/Motors_aft.mtl', obj: 'models/Motors_aft.obj' },
-            { mtl: 'models/Propellers_fwd.mtl', obj: 'models/Propellers_fwd.obj' },
-            { mtl: 'models/Propeller_aft.mtl', obj: 'models/Propeller_aft.obj' },
-            { mtl: 'models/Propeller_plate_fwd.mtl', obj: 'models/Propeller_plate_fwd.obj' },
-            { mtl: 'models/Propeller_plate_aft.mtl', obj: 'models/Propeller_plate_aft.obj' },
-            { mtl: 'models/Support_duct_fwd.mtl', obj: 'models/Support_duct_fwd.obj' },
-            { mtl: 'models/Support_duct_aft.mtl', obj: 'models/Support_duct_aft.obj' },
-            { mtl: 'models/Duct_holder_fwd.mtl', obj: 'models/Duct_holder_fwd.obj' },
-            { mtl: 'models/Duct_holder_aft.mtl', obj: 'models/Duct_holder_aft.obj' },
-            { mtl: 'models/Ducts_top_fwd.mtl', obj: 'models/Ducts_top_fwd.obj' },
-            { mtl: 'models/Ducts_top_aft.mtl', obj: 'models/Ducts_top_aft.obj' },
-            { mtl: 'models/Ducts_bottom_fwd.mtl', obj: 'models/Ducts_bottom_fwd.obj' },
-            { mtl: 'models/Ducts_bottom_aft.mtl', obj: 'models/Ducts_bottom_aft.obj' },
-        ];
+        // Add a simple cube as a test object
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); // Green cube
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
 
-        /*
-        loadModel('models/Front_cover.mtl', 'models/Front_cover.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Rear_cover.mtl', 'models/Rear_cover.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Seat.mtl', 'models/Seat.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Roll_hoop.mtl', 'models/Roll_hoop.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Roll_hoop_cover.mtl', 'models/Roll_hoop_cover.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Side_cover_top_l.mtl', 'models/Side_cover_top_l.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Side_cover_r.mtl', 'models/Side_cover_r.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Side_cover_bottom_l.mtl', 'models/Side_cover_bottom_l.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Seat_belts.mtl', 'models/Seat_belts.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Canopy_edge.mtl', 'models/Canopy_edge.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Joystick.mtl', 'models/Joystick.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Throttle.mtl', 'models/Throttle.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Display.mtl', 'models/Display.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Skids.mtl', 'models/Skids.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Arm_fwd.mtl', 'models/Arm_fwd.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Arm_aft.mtl', 'models/Arm_aft.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Motor_support_fwd.mtl', 'models/Motor_support_fwd.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Motor_support_Aft.mtl', 'models/Motor_support_Aft.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Motors_fwd.mtl', 'models/Motors_fwd.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Motors_aft.mtl', 'models/Motors_aft.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Propellers_fwd.mtl', 'models/Propellers_fwd.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Propeller_aft.mtl', 'models/Propeller_aft.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Propeller_plate_fwd.mtl', 'models/Propeller_plate_fwd.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Propeller_plate_aft.mtl', 'models/Propeller_plate_aft.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Support_duct_fwd.mtl', 'models/Support_duct_fwd.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Support_duct_aft.mtl', 'models/Support_duct_aft.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Duct_holder_fwd.mtl', 'models/Duct_holder_fwd.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Duct_holder_aft.mtl', 'models/Duct_holder_aft.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Ducts_top_fwd.mtl', 'models/Ducts_top_fwd.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Ducts_top_aft.mtl', 'models/Ducts_top_aft.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Ducts_bottom_fwd.mtl', 'models/Ducts_bottom_fwd.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Ducts_bottom_aft.mtl', 'models/Ducts_bottom_aft.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Part2.mtl', 'models/Part2.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Part2.mtl', 'models/Part2.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Part2.mtl', 'models/Part2.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Part2.mtl', 'models/Part2.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Part2.mtl', 'models/Part2.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Part2.mtl', 'models/Part2.obj', {x: 0, y: 0, z: 0});
-        loadModel('models/Part2.mtl', 'models/Part2.obj', {x: 0, y: 0, z: 0});
+        // Position camera
+        camera.position.set(0, 0, 5);
+        camera.lookAt(0, 0, 0);
 
-        loadModel('models/Mono.mtl', 'models/Mono.obj', {x: 0, y: 0, z: 0});  
-        */
-
-        // Load initial parts (Mono, Front_cover, Rear_cover) and display each as it's ready
-        initialParts.forEach(part => {
-            loadModel(part.mtl, part.obj, {x: 0, y: 0, z: 0}).then((object) => {
-                scene.add(object);
-                console.log(`${part.obj} added to scene`);
-
-                // Compute bounding box after loading the first part (Mono) for initial camera setup
-                if (part.obj === 'models/Mono.obj') {
-                    objectBoundingBox = new THREE.Box3().setFromObject(object);
-                    objectCenter = objectBoundingBox.getCenter(new THREE.Vector3());
-                    camera.position.set(0, -1.5, 1.5);
-                    camera.lookAt(objectCenter);
-                }
-            }).catch((error) => {
-                console.error(`Failed to load ${part.obj}:`, error);
-            });
-        });
-
-        // Load all remaining parts and add them only when all are ready
-        Promise.all(remainingParts.map(part => 
-            loadModel(part.mtl, part.obj, {x: 0, y: 0, z: 0})
-                .catch(error => {
-                    console.error(`Failed to load ${part.obj}, skipping:`, error);
-                    return null; // Return null for failed loads
-                })
-        )).then((loadedParts) => {
-            const validParts = loadedParts.filter(part => part !== null);
-            if (validParts.length > 0) {
-                validParts.forEach(part => scene.add(part));
-                console.log(`Added ${validParts.length} remaining parts to scene`);
-            } else {
-                console.warn('No remaining parts were successfully loaded');
-            }
-            objectBoundingBox = new THREE.Box3().setFromObject(scene);
-            objectCenter = objectBoundingBox.getCenter(new THREE.Vector3());
-            resizeRenderer();
-        }).catch((error) => {
-            console.error('Unexpected error in Promise.all:', error);
-        });
-
-      // Add TrackballControls for unrestricted rotation
-        const controls = new THREE.TrackballControls(camera, renderer.domElement);
-        controls.rotateSpeed = 2.5;    // Speed of rotation
-        controls.zoomSpeed = 5;      // Speed of zooming
-        controls.panSpeed = 2;       // Speed of panning
-        controls.staticMoving = true; // Smooth movement (dynamic damping)
-        controls.dynamicDampingFactor = 0.05; // Damping strength
-        controls.minDistance = 0.3;      // Minimum zoom distance
-        controls.maxDistance = 2;     // Maximum zoom distance
-
+        // Handle window resize
         function resizeRenderer() {
-            const totalWidth = wrapper.clientWidth;
-            const leftWidth = leftText ? leftText.offsetWidth : 0;
-            const rightWidth = rightText ? rightText.offsetWidth : 0;
-            const canvasWidth = totalWidth - leftWidth - rightWidth;
-
-            renderer.setSize(canvasWidth, container.clientHeight);
-            camera.aspect = canvasWidth / container.clientHeight;
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            renderer.setSize(width, height);
+            camera.aspect = width / height;
             camera.updateProjectionMatrix();
         }
-
-        resizeRenderer();
         window.addEventListener('resize', resizeRenderer);
+        resizeRenderer();
 
-        const observer = new MutationObserver(resizeRenderer);
-        [logo, topText, leftText, rightText, bottomText].forEach(element => {
-            if (element) observer.observe(element, { childList: true, subtree: true, characterData: true });
-        });
-
-        // Flag to control rotation
-        let isRotating = true;
-
-        // Event listeners for mouse and touch to stop rotation
-        renderer.domElement.addEventListener('mousedown', (event) => {
-            if (event.button === 0) { // Left mouse button
-                isRotating = false;
-            }
-        });
-
-        renderer.domElement.addEventListener('touchstart', () => {
-            isRotating = false;
-        });
-
-        // Optional: Resume rotation when interaction ends
-        renderer.domElement.addEventListener('mouseup', () => {
-            isRotating = true;
-        });
-
-        renderer.domElement.addEventListener('touchend', () => {
-            isRotating = true;
-        });
-        
         // Animation loop
         function animate() {
             requestAnimationFrame(animate);
-            controls.update(); // Apply user input
-
-            // Rotate the entire scene slowly around the Z-axis
-            if (isRotating) {
-            scene.rotation.z += 0.003; // Adjust this value for rotation speed
-            }
-
-            renderer.clear();
+            cube.rotation.x += 0.01; // Rotate cube
+            cube.rotation.y += 0.01;
             renderer.render(scene, camera);
         }
         animate();
