@@ -24,7 +24,7 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    background-color: #d3d3d3; /* Light grey */
+    background-color: #ffffff; /* Light grey */
     margin-top: 5px; /* Small distance from top */
     margin-left: 15px; /* Bigger left margin */
     margin-right: 15px; /* Bigger right margin */
@@ -39,7 +39,7 @@ body {
 }
 
 #header-box:hover {
-    background-color: #ffdab9; /* Light orange (peachpuff) on hover */
+    background-color: #d3d3d3; /* Light orange (peachpuff) on hover */
 }
 
 #logo {
@@ -58,7 +58,6 @@ body {
     font-size: 16px;
     padding: 10px 20px;
     background-color: #333333;
-    border: 2px solid #333333; /* Squared edges */
     color: #ffffff;
     cursor: pointer;
     text-align: center;
@@ -71,15 +70,62 @@ body {
     color: #ffffff;
 }
 #wrapper {
-    margin-top: 80px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Full viewport height */
     width: 100%;
-    max-width: 100%;
-    margin: 0 auto; /* Centers the wrapper horizontally, no vertical margin */
-    padding: 5px;
+    max-width: 1200px;
+    margin: 0 auto; /* Center horizontally */
+    padding: 80px 15px 0 15px; /* Top padding for header, match left/right margins */
     box-sizing: border-box;
 }
+
+#top-text {
+    text-align: center;
+    padding: 20px 0;
+    font-family: 'FORMULA1-WIDE', sans-serif;
+    font-size: 40px;
+    color: #DF4949;
+}
+
+#content {
+    display: flex;
+    flex: 1; /* Takes remaining space between top and bottom text */
+    gap: 20px;
+    width: 100%;
+    padding-bottom: 20px; /* Space before bottom text */
+}
+
+#left-text {
+    flex: 1; /* Equal width with right-text */
+    min-width: 0; /* Prevent overflow */
+    font-family: 'FORMULA1-REGULAR', sans-serif;
+    font-size: 18px;
+    color: #595959;
+}
+
 #canvas-container {
     height: 400px;
     width: 100%;
     box-sizing: border-box;
+}
+
+#right-text {
+    flex: 1; /* Equal width with left-text */
+    min-width: 0;
+    font-family: 'FORMULA1-REGULAR', sans-serif;
+    font-size: 18px;
+    color: #595959;
+}
+
+#bottom-text {
+    text-align: center;
+    padding: 20px 0;
+    font-family: 'FORMULA1-REGULAR', sans-serif;
+    font-size: 18px;
+    color: #7F7F7F;
+    position: sticky; /* Stick to bottom */
+    bottom: 0;
+    background-color: #ffffff; /* Ensure visibility over content */
+    z-index: 5;
 }
