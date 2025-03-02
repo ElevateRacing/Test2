@@ -53,6 +53,8 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/MTLLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/controls/TrackballControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/RGBELoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/geometries/DecalGeometry.js"></script> <!-- Added for decals -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js"></script> <!-- Added for interactive GUI -->
     <script>
         // Scene, camera, and renderer setup
         const scene = new THREE.Scene();
@@ -173,6 +175,65 @@
                 console.error('Error loading Mono_optimized.mtl:', error);
             });
         }
+
+        // Add decal
+        function addDecal() {
+            if (!model) return;
+
+            const textureLoader = new THREE.TextureLoader();
+            textureLoader.load('55.png', function (texture) { // Replace with your decal filename
+                const decalMaterial = new THREE.MeshPhongMaterial({
+                    map: texture,
+                    transparent: true,
+                    depthTest: true,
+                    depthWrite: false,
+                    polygonOffset: true,
+                    polygonOffsetFactor: -4 // Ensures decal renders above surface
+                });
+
+                // Decal parameters (adjustable via GUI)
+                const decalParams = {
+                    positionX: 0,
+                    positionY: 0,
+                    positionZ: 0,
+                    rotationX: 0,
+                    rotationY: 0,
+                    rotationZ: 0,
+                    scale: 0.1 // Size in model units (adjust based on 0.004 scale)
+                };
+
+                function updateDecal() {
+                    if (decal) scene.remove(decal);
+                    const position = new THREE.Vector3(decalParams.positionX, decalParams.positionY, decalParams.positionZ);
+                    const rotation = new THREE.Euler(decalParams.rotationX, decalParams.rotationY, decalParams.rotationZ);
+                    const size = new THREE.Vector3(decalParams.scale, decalParams.scale, decalParams.scale);
+                    decal = new THREE.Mesh(
+                        new THREE.DecalGeometry(model, position, rotation, size),
+                        decalMaterial
+                    );
+                    scene.add(decal);
+                }
+
+                // Add GUI for interactive adjustment
+                const gui = new dat.GUI();
+                gui.add(decalParams, 'positionX', -1, 1, 0.01).name('Pos X').onChange(updateDecal);
+                gui.add(decalParams, 'positionY', -1, 1, 0.01).name('Pos Y').onChange(updateDecal);
+                gui.add(decalParams, 'positionZ', -1, 1, 0.01).name('Pos Z').onChange(updateDecal);
+                gui.add(decalParams, 'rotationX', -Math.PI, Math.PI, 0.01).name('Rot X').onChange(updateDecal);
+                gui.add(decalParams, 'rotationY', -Math.PI, Math.PI, 0.01).name('Rot Y').onChange(updateDecal);
+                gui.add(decalParams, 'rotationZ', -Math.PI, Math.PI, 0.01).name('Rot Z').onChange(updateDecal);
+                gui.add(decalParams, 'scale', 0.01, 0.5, 0.01).name('Scale').onChange(updateDecal);
+
+                updateDecal(); // Initial decal placement
+            }, undefined, function (error) {
+                console.error('Error loading decal.png:', error);
+            });
+        }
+
+
+
+
+        
 
         // Add TrackballControls
         const controls = new THREE.TrackballControls(camera, renderer.domElement);
