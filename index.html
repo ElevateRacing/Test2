@@ -88,12 +88,13 @@
                 scene.environment = texture;
                 environmentTexture = texture;
                 console.log('HDRI environment loaded successfully!');
-                loadAndApplyModel();
+                loadModel();
             },
             undefined,
             function (error) {
                 console.error('Error loading HDRI:', error);
-                loadAndApplyModel();
+                environmentalTexture = null;
+                loadModel();
             }
         );
 
@@ -123,7 +124,7 @@
             color: 0xC8102E,
             metalness: 0.3,
             roughness: 0.1,
-            envMap: environmentTexture,
+            envMap: environmentTexture || null,
             envMapIntensity: 1.0
         });
 
@@ -131,7 +132,7 @@
             color: 0x1C2526,
             metalness: 0.1,
             roughness: 0.6,
-            envMap: environmentTexture,
+            envMap: environmentTexture || null,
             envMapIntensity: 0.5
         });
 
@@ -146,10 +147,20 @@
 
         // Load models
         function loadModels() {
+            if (!environmentTexture) {
+                console.warn('HDR not loaded yet, applying materials without envMap initially.');
+            }
+
             modelsToLoad.forEach(modelInfo => {
                 const mtlLoader = new THREE.MTLLoader();
                 mtlLoader.load(modelInfo.mtl, function (materials) {
                     materials.preload();
+
+                    // Update envMap if HDR loaded after materials initialized
+                    if (environmentTexture) {
+                        Paint_Red.envMap = environmentTexture;
+                        CFRP_Matt.envMap = environmentTexture;
+                    }
 
                     // Override materials with custom HDR versions
                     for (const [mtlName, newMaterial] of Object.entries(modelInfo.materials)) {
@@ -170,11 +181,11 @@
                             scene.add(object);
                             console.log(`${modelInfo.obj} added to scene with HDR materials`);
 
-                            // Set camera based on the first model’s bounding box (or adjust as needed)
+                            // Set camera based on the first model’s bounding box
                             if (modelInfo.obj === 'models/Mono_optimized.obj') {
                                 const objectBoundingBox = new THREE.Box3().setFromObject(object);
                                 const objectCenter = objectBoundingBox.getCenter(new THREE.Vector3());
-                                camera.position.set(0, 0, 0);
+                                camera.position.set(0, -1.5, 1.5); // Adjusted from (0, 0, 0) to match your intent
                                 camera.lookAt(objectCenter);
                             }
                         },
