@@ -103,6 +103,9 @@
         let environmentTexture = null;
         let Paint_Red = null;
         let CFRP_Matt = null;
+        let Blue_Fabric = null; // Blue fabric for safety belts
+        let Brushed_Stainless = null; // Brushed stainless steel
+        let Matte_Red_Steel = null; // Painted matte red steel
 
         // List of models to load with material mappings
         const modelsToLoad = [
@@ -113,7 +116,8 @@
             { obj: 'models/Left_cover_optimized.obj', mtl: 'models/Left_cover_optimized.mtl', materials: { 'CFRP': 'CFRP_Matt' } },
             { obj: 'models/Right_cover_optimized.obj', mtl: 'models/Right_cover_optimized.mtl', materials: { 'CFRP': 'CFRP_Matt' } },
             { obj: 'models/Roll_hoop_optimized.obj', mtl: 'models/Roll_hoop_optimized.mtl', materials: { 'CFRP': 'CFRP_Matt' } },
-            { obj: 'models/Roll_hoop_cover_optimized.obj', mtl: 'models/Roll_hoop_cover_optimized.mtl', materials: { 'CFRP': 'CFRP_Matt', 'Powder_Coat_(Red)': 'Paint_Red' } }
+            { obj: 'models/Roll_hoop_cover_optimized.obj', mtl: 'models/Roll_hoop_cover_optimized.mtl', materials: { 'CFRP': 'CFRP_Matt', 'Powder_Coat_(Red)': 'Paint_Red' } },
+            { obj: 'models/Safety_belt_optimized.obj', mtl: 'models/Safety_belt_optimized.mtl', materials: { 'Stainless_Steel_-_Satin': 'Brushed_Stainless', 'Belt_(Blue)': 'Blue_Fabric', 'Plastic_-_Matte_(Red)': 'Matte_Red_Steel' } }
         ];
 
         // Load HDR and initialize materials, then load models
@@ -141,6 +145,30 @@
                     roughness: 0.6,
                     envMap: environmentTexture,
                     envMapIntensity: 0.5
+                });
+
+                Blue_Fabric = new THREE.MeshStandardMaterial({
+                    color: 0x1E90FF, // Dodger Blue for safety belts
+                    metalness: 0.0, // Non-metallic fabric
+                    roughness: 0.7, // Fabric texture
+                    envMap: environmentTexture,
+                    envMapIntensity: 0.3 // Subtle reflections
+                });
+
+                Brushed_Stainless = new THREE.MeshStandardMaterial({
+                    color: 0xA9A9A9, // Silver-gray for stainless steel
+                    metalness: 0.8, // Highly metallic
+                    roughness: 0.4, // Brushed finish
+                    envMap: environmentTexture,
+                    envMapIntensity: 1.0 // Strong reflections
+                });
+
+                Matte_Red_Steel = new THREE.MeshStandardMaterial({
+                    color: 0xB22222, // Firebrick for matte red steel
+                    metalness: 0.2, // Slightly metallic
+                    roughness: 0.8, // Matte finish
+                    envMap: environmentTexture,
+                    envMapIntensity: 0.2 // Minimal reflections
                 });
 
                 loadModels(); // Start loading models
