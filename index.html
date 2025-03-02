@@ -89,12 +89,12 @@
         let textMesh, plane;
         const fontLoader = new THREE.FontLoader();
         fontLoader.load(
-            'Formula1 Display Bold.json',
+            'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', // Standard font
             function (font) {
                 console.log('Font loaded successfully:', font);
                 const textGeometry = new THREE.TextGeometry('Elevate Racing', {
                     font: font,
-                    size: 0.2,
+                    size: 0.15, // Reduced size to fit better
                     height: 0.05,
                     curveSegments: 12,
                     bevelEnabled: false
@@ -105,13 +105,14 @@
                 // Center the text
                 textGeometry.computeBoundingBox();
                 const textWidth = textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x;
-                textMesh.position.set(-textWidth / 2, -1.5, 0);
+                const textHeight = textGeometry.boundingBox.max.y - textGeometry.boundingBox.min.y;
+                textMesh.position.set(-textWidth / 2, -1.5 - textHeight / 2, 0);
 
                 // Semi-transparent rounded background
                 const shape = new THREE.Shape();
-                const width = textWidth + 0.4;
-                const height = 0.4;
-                const radius = 0.1; // Corner radius
+                const width = textWidth + 0.2; // Smaller padding
+                const height = textHeight + 0.2;
+                const radius = 0.05; // Smaller radius for tighter fit
                 shape.moveTo(-width / 2, -height / 2);
                 shape.lineTo(width / 2 - radius, -height / 2);
                 shape.quadraticCurveTo(width / 2, -height / 2, width / 2, -height / 2 + radius);
@@ -176,12 +177,12 @@
             cube.rotation.x += 0.01;
             cube.rotation.y += 0.01;
 
-            // Update text and plane orientation (Y-axis only)
+            // Update text and plane orientation (correct Y-axis rotation)
             if (textMesh && plane) {
                 const cameraDirection = new THREE.Vector3();
                 camera.getWorldDirection(cameraDirection);
-                const angle = Math.atan2(cameraDirection.x, cameraDirection.z);
-                textMesh.rotation.set(0, angle, 0); // Flat, only Y rotation
+                const angle = Math.atan2(-cameraDirection.x, -cameraDirection.z); // Flip direction
+                textMesh.rotation.set(0, angle, 0); // Flat, facing forward
                 plane.rotation.set(0, angle, 0);    // Match text
             }
 
