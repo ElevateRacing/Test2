@@ -87,19 +87,19 @@ html, body {
     grid-area: top-text;
     text-align: center;
     padding: 20px 0;
-    font-family: 'FORMULA1-WIDE', sans-serif;
-    color: #DF4949;
 }
 
 .line1 {
+    display: block;
     font-family: 'FORMULA1-WIDE', sans-serif;
     font-size: 40px;
     color: #DF4949;
 }
 
 .line2 {
+    display: block;
     font-family: 'FORMULA1-BOLD', sans-serif;
-    font-size: 20px;
+    font-size: 30px;
     color: #404040;
 }
 
