@@ -33,21 +33,17 @@
         <div id="bottom-text">Bottom text</div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/OBJLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/MTLLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/controls/TrackballControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/RGBELoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/FontLoader.js"></script> <!-- Added FontLoader -->
     <script>
         // Scene, camera, and renderer setup
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000); //Reduce FOV from 75 to 45
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-        renderer.setClearColor(0xd3d3d3, 1);
-        
-        renderer.toneMapping = THREE.ACESFilmicToneMapping; // Better color/contrast
-        renderer.toneMappingExposure = 0.9; // Adjust exposure
-        renderer.physicallyCorrectLights = true; // Realistic light falloff
-        
+        renderer.setClearColor(0xd3d3d3, 1); // Light gray background
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 0.9;
+        renderer.physicallyCorrectLights = true;
+
         const container = document.getElementById('canvas-container');
         if (!container) {
             console.error('Canvas container not found!');
@@ -55,10 +51,6 @@
             renderer.setSize(container.clientWidth, container.clientHeight);
             container.appendChild(renderer.domElement);
         }
-
-        // Add coordinate axes
-        //const axesHelper = new THREE.AxesHelper(1); // Size of 1 unit
-        //scene.add(axesHelper);
 
         // Add ambient lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 2.0);
@@ -68,23 +60,14 @@
         const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.4);
         directionalLight1.position.set(5, 10, 5);
         scene.add(directionalLight1);
-        // Add helper to visualize the directional light
-        //const lightHelper1 = new THREE.DirectionalLightHelper(directionalLight1, 1); // Size of helper = 1 unit
-        //scene.add(lightHelper1);
 
         const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.6);
         directionalLight2.position.set(-5, 5, -5);
         scene.add(directionalLight2);
-        // Add helper to visualize the directional light
-        //const lightHelper2 = new THREE.DirectionalLightHelper(directionalLight2, 1); // Size of helper = 1 unit
-        //scene.add(lightHelper2);
 
         const directionalLight3 = new THREE.DirectionalLight(0xffffff, 0.3);
         directionalLight3.position.set(0, -5, 5);
         scene.add(directionalLight3);
-        // Add helper to visualize the directional light
-        //const lightHelper3 = new THREE.DirectionalLightHelper(directionalLight3, 1); // Size of helper = 1 unit
-        //scene.add(lightHelper3);
 
         const pointLight = new THREE.PointLight(0xffffff, 0.3, 50);
         pointLight.position.set(0, 5, 5);
@@ -101,7 +84,8 @@
         camera.position.set(0, 0, 5);
         camera.lookAt(0, 0, 0);
 
-        // Text Setup (assuming MyFont.json is in your project folder)
+        // Text Setup
+        let textMesh, plane; // Declare variables globally for animation loop access
         const fontLoader = new THREE.FontLoader();
         fontLoader.load('Formula1 Display Bold.json', function (font) {
             const textGeometry = new THREE.TextGeometry('Elevate Racing', {
@@ -112,7 +96,7 @@
                 bevelEnabled: false
             });
             const textMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 }); // Black text
-            const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+            textMesh = new THREE.Mesh(textGeometry, textMaterial);
 
             // Center the text
             textGeometry.computeBoundingBox();
@@ -120,32 +104,27 @@
             textMesh.position.set(-textWidth / 2, -1.5, 0); // Bottom of scene
 
             // Semi-transparent background plane
-            const planeGeometry = new THREE.PlaneGeometry(textWidth + 0.4, 0.4); // Slightly larger than text
+            const planeGeometry = new THREE.PlaneGeometry(textWidth + 0.4, 0.4);
             const planeMaterial = new THREE.MeshBasicMaterial({
                 color: 0xffffff,
                 transparent: true,
                 opacity: 0.5,
                 side: THREE.DoubleSide
             });
-            const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+            plane = new THREE.Mesh(planeGeometry, planeMaterial);
             plane.position.set(0, -1.5, -0.01); // Slightly behind text
 
-            // Round edges simulated with border-radius-like effect (optional shader needed for true rounding)
             scene.add(plane);
             scene.add(textMesh);
-
-            // Make text and plane always face camera
-            function updateTextOrientation() {
-                textMesh.lookAt(camera.position);
-                plane.lookAt(camera.position);
-            }
-            updateTextOrientation();
-            scene.addEventListener('update', updateTextOrientation); // Custom update loop
+        }, undefined, function (error) {
+            console.error('Error loading font:', error);
+            // Fallback: Add a red cube if font fails
+            const fallbackGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+            const fallbackMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            const fallbackCube = new THREE.Mesh(fallbackGeometry, fallbackMaterial);
+            fallbackCube.position.set(0, -1.5, 0);
+            scene.add(fallbackCube);
         });
-
-        
-
-        
 
         // Handle window resize
         function resizeRenderer() {
@@ -161,11 +140,18 @@
         // Animation loop
         function animate() {
             requestAnimationFrame(animate);
-            cube.rotation.x += 0.01; // Rotate cube
+            cube.rotation.x += 0.01;
             cube.rotation.y += 0.01;
+
+            // Update text and plane orientation if they exist
+            if (textMesh && plane) {
+                textMesh.lookAt(camera.position);
+                plane.lookAt(camera.position);
+            }
+
             renderer.render(scene, camera);
         }
         animate();
-        </script>
+    </script>
 </body>
 </html>
