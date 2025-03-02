@@ -34,7 +34,7 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/FontLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/geometries/TextGeometry.js"></script> <!-- Added TextGeometry -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/geometries/TextGeometry.js"></script>
     <script>
         // Scene, camera, and renderer setup
         const scene = new THREE.Scene();
@@ -107,8 +107,22 @@
                 const textWidth = textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x;
                 textMesh.position.set(-textWidth / 2, -1.5, 0);
 
-                // Semi-transparent background plane
-                const planeGeometry = new THREE.PlaneGeometry(textWidth + 0.4, 0.4);
+                // Semi-transparent rounded background
+                const shape = new THREE.Shape();
+                const width = textWidth + 0.4;
+                const height = 0.4;
+                const radius = 0.1; // Corner radius
+                shape.moveTo(-width / 2, -height / 2);
+                shape.lineTo(width / 2 - radius, -height / 2);
+                shape.quadraticCurveTo(width / 2, -height / 2, width / 2, -height / 2 + radius);
+                shape.lineTo(width / 2, height / 2 - radius);
+                shape.quadraticCurveTo(width / 2, height / 2, width / 2 - radius, height / 2);
+                shape.lineTo(-width / 2 + radius, height / 2);
+                shape.quadraticCurveTo(-width / 2, height / 2, -width / 2, height / 2 - radius);
+                shape.lineTo(-width / 2, -height / 2 + radius);
+                shape.quadraticCurveTo(-width / 2, -height / 2, -width / 2 + radius, -height / 2);
+
+                const planeGeometry = new THREE.ShapeGeometry(shape);
                 const planeMaterial = new THREE.MeshBasicMaterial({
                     color: 0xffffff,
                     transparent: true,
@@ -126,7 +140,6 @@
             },
             function (error) {
                 console.error('Error loading font:', error);
-                // Fallback: Red box
                 const fallbackGeometry = new THREE.BoxGeometry(1, 0.2, 0.1);
                 const fallbackMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
                 textMesh = new THREE.Mesh(fallbackGeometry, fallbackMaterial);
@@ -163,10 +176,13 @@
             cube.rotation.x += 0.01;
             cube.rotation.y += 0.01;
 
-            // Update text and plane orientation if they exist
+            // Update text and plane orientation (Y-axis only)
             if (textMesh && plane) {
-                textMesh.lookAt(camera.position);
-                plane.lookAt(camera.position);
+                const cameraDirection = new THREE.Vector3();
+                camera.getWorldDirection(cameraDirection);
+                const angle = Math.atan2(cameraDirection.x, cameraDirection.z);
+                textMesh.rotation.set(0, angle, 0); // Flat, only Y rotation
+                plane.rotation.set(0, angle, 0);    // Match text
             }
 
             renderer.render(scene, camera);
