@@ -107,7 +107,7 @@ html, body {
 }
 
 .top-image {
-    max-width: 100%; /* Ensures it fits within container */
+    max-width: 60%; /* Ensures it fits within container */
     height: auto; /* Maintains aspect ratio */
     display: block; /* Centers properly with text-align */
     margin: 0 auto; /* Centers horizontally */
