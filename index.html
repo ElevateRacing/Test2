@@ -106,6 +106,9 @@
         let Blue_Fabric = null; // Blue fabric for safety belts
         let Brushed_Stainless = null; // Brushed stainless steel
         let Matte_Red_Steel = null; // Painted matte red steel
+        let Plastic_Grey = null; // Plastic grey
+        let Plastic_Black = null; // Plastic black
+        let Plastic_Red = null; // Plastic red
 
         // List of models to load with material mappings
         const modelsToLoad = [
@@ -122,9 +125,9 @@
             { obj: 'models/Edge_R_optimized.obj', mtl: 'models/Edge_R_optimized.mtl', materials: { 'CFRP': 'CFRP_Matt' } },
             { obj: 'models/Edge_L_optimized.obj', mtl: 'models/Edge_L_optimized.mtl', materials: { 'CFRP': 'CFRP_Matt' } },
             { obj: 'models/Display_holder_optimized.obj', mtl: 'models/Display_holder_optimized.mtl', materials: { 'Steel_-_Satin': 'Brushed_Stainless' } },
-            { obj: 'models/Display_optimized.obj', mtl: 'models/Display_optimized.mtl', materials: { 'Grey_Plastic': 'CFRP_Matt', 'Display_Screen': 'Blue_Fabric' } },
-            { obj: 'models/Joystick_optimized.obj', mtl: 'models/Joystick_optimized.mtl', materials: { 'Plastic_Black': 'CFRP_Matt', 'Plastic_Red': 'Paint_Red' } },
-            { obj: 'models/Throttle_optimized.obj', mtl: 'models/Throttle_optimized.mtl', materials: { 'Plastic_Black': 'CFRP_Matt', 'Steel_-_Satin': 'Brushed_Stainless' } }
+            { obj: 'models/Display_optimized.obj', mtl: 'models/Display_optimized.mtl', materials: { 'Grey_Plastic': 'Plastic_Grey', 'Display_Screen': 'Blue_Fabric' } },
+            { obj: 'models/Joystick_optimized.obj', mtl: 'models/Joystick_optimized.mtl', materials: { 'Plastic_Black': 'Plastic_Black', 'Plastic_Red': 'Plastic_Red' } },
+            { obj: 'models/Throttle_optimized.obj', mtl: 'models/Throttle_optimized.mtl', materials: { 'Plastic_Black': 'Plastic_Black', 'Steel_-_Satin': 'Brushed_Stainless' } }
         ];
 
         // Load HDR and initialize materials, then load models
@@ -176,6 +179,30 @@
                     roughness: 0.8, // Matte finish
                     envMap: environmentTexture,
                     envMapIntensity: 0.2 // Minimal reflections
+                });
+
+                Plastic_Grey = new THREE.MeshStandardMaterial({
+                    color: 0x808080, // Medium Grey
+                    metalness: 0.0, // Non-metallic plastic
+                    roughness: 0.6, // Smooth plastic
+                    envMap: environmentTexture,
+                    envMapIntensity: 0.3 // Subtle reflections
+                });
+
+                Plastic_Black = new THREE.MeshStandardMaterial({
+                    color: 0x1A1A1A, // Near-black
+                    metalness: 0.0, // Non-metallic plastic
+                    roughness: 0.7, // Matte plastic
+                    envMap: environmentTexture,
+                    envMapIntensity: 0.2 // Minimal reflections
+                });
+
+                Plastic_Red = new THREE.MeshStandardMaterial({
+                    color: 0xFF4040, // Bright red
+                    metalness: 0.0, // Non-metallic plastic
+                    roughness: 0.5, // Semi-glossy plastic
+                    envMap: environmentTexture,
+                    envMapIntensity: 0.4 // Moderate reflections
                 });
 
                 loadModels(); // Start loading models
