@@ -59,12 +59,20 @@ html, body {
 }
 
 #header-box:hover {
-    background-color: #f9f9f9;
+    background-color: #fdfdfd;
 }
 
-#logo {
+#logo-left {
     padding: 10px;
     min-width: 0;
+}
+
+#logo-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%); /* Center horizontally */
+    padding: 10px;
+    flex-shrink: 0;
 }
 
 #header-buttons {
@@ -74,7 +82,7 @@ html, body {
 }
 
 .header-button {
-    font-family: 'FORMULA1-REGULAR', sans-serif;
+    font-family: 'FORMULA1-BOLD', sans-serif;
     font-size: 14px;
     padding: 10px 20px;
     background-color: #404040;
