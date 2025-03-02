@@ -33,7 +33,7 @@
         <div id="bottom-text">Bottom text</div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/FontLoader.js"></script> <!-- Added FontLoader -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/FontLoader.js"></script>
     <script>
         // Scene, camera, and renderer setup
         const scene = new THREE.Scene();
@@ -85,46 +85,65 @@
         camera.lookAt(0, 0, 0);
 
         // Text Setup
-        let textMesh, plane; // Declare variables globally for animation loop access
+        let textMesh, plane;
         const fontLoader = new THREE.FontLoader();
-        fontLoader.load('Formula1 Display Bold.json', function (font) {
-            const textGeometry = new THREE.TextGeometry('Elevate Racing', {
-                font: font,
-                size: 0.2,
-                height: 0.05,
-                curveSegments: 12,
-                bevelEnabled: false
-            });
-            const textMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 }); // Black text
-            textMesh = new THREE.Mesh(textGeometry, textMaterial);
+        fontLoader.load(
+            'Formula1 Display Bold.json',
+            function (font) {
+                console.log('Font loaded successfully:', font);
+                const textGeometry = new THREE.TextGeometry('Elevate Racing', {
+                    font: font,
+                    size: 0.2,
+                    height: 0.05,
+                    curveSegments: 12,
+                    bevelEnabled: false
+                });
+                const textMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 }); // Black text
+                textMesh = new THREE.Mesh(textGeometry, textMaterial);
 
-            // Center the text
-            textGeometry.computeBoundingBox();
-            const textWidth = textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x;
-            textMesh.position.set(-textWidth / 2, -1.5, 0); // Bottom of scene
+                // Center the text
+                textGeometry.computeBoundingBox();
+                const textWidth = textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x;
+                textMesh.position.set(-textWidth / 2, -1.5, 0); // Bottom of scene
 
-            // Semi-transparent background plane
-            const planeGeometry = new THREE.PlaneGeometry(textWidth + 0.4, 0.4);
-            const planeMaterial = new THREE.MeshBasicMaterial({
-                color: 0xffffff,
-                transparent: true,
-                opacity: 0.5,
-                side: THREE.DoubleSide
-            });
-            plane = new THREE.Mesh(planeGeometry, planeMaterial);
-            plane.position.set(0, -1.5, -0.01); // Slightly behind text
+                // Semi-transparent background plane
+                const planeGeometry = new THREE.PlaneGeometry(textWidth + 0.4, 0.4);
+                const planeMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xffffff,
+                    transparent: true,
+                    opacity: 0.5,
+                    side: THREE.DoubleSide
+                });
+                plane = new THREE.Mesh(planeGeometry, planeMaterial);
+                plane.position.set(0, -1.5, -0.01); // Slightly behind text
 
-            scene.add(plane);
-            scene.add(textMesh);
-        }, undefined, function (error) {
-            console.error('Error loading font:', error);
-            // Fallback: Add a red cube if font fails
-            const fallbackGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-            const fallbackMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-            const fallbackCube = new THREE.Mesh(fallbackGeometry, fallbackMaterial);
-            fallbackCube.position.set(0, -1.5, 0);
-            scene.add(fallbackCube);
-        });
+                scene.add(plane);
+                scene.add(textMesh);
+            },
+            function (xhr) {
+                console.log('Font loading progress:', (xhr.loaded / xhr.total * 100) + '%');
+            },
+            function (error) {
+                console.error('Error loading font:', error);
+                // Fallback: Add a simple red box with text-like appearance
+                const fallbackGeometry = new THREE.BoxGeometry(1, 0.2, 0.1);
+                const fallbackMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+                textMesh = new THREE.Mesh(fallbackGeometry, fallbackMaterial);
+                textMesh.position.set(0, -1.5, 0);
+                scene.add(textMesh);
+
+                const planeGeometry = new THREE.PlaneGeometry(1.4, 0.4);
+                const planeMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xffffff,
+                    transparent: true,
+                    opacity: 0.5,
+                    side: THREE.DoubleSide
+                });
+                plane = new THREE.Mesh(planeGeometry, planeMaterial);
+                plane.position.set(0, -1.5, -0.01);
+                scene.add(plane);
+            }
+        );
 
         // Handle window resize
         function resizeRenderer() {
