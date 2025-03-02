@@ -125,26 +125,26 @@
                 materials.preload();
 
                 // Define two custom HDR-enhanced PBR materials
-                const material1 = new THREE.MeshStandardMaterial({
-                    color: 0xaaaaaa, // Example: silver for body
-                    metalness: 0.8,
-                    roughness: 0.2,
+                const CFRP_Matt = new THREE.MeshStandardMaterial({
+                    color: 0x1C2526, // Dark gray-black for carbon fibre
+                    metalness: 0.1, // Low metalness (non-metallic)
+                    roughness: 0.6, // Higher roughness for semi-matte look
                     envMap: environmentTexture,
-                    envMapIntensity: 1.0
+                    envMapIntensity: 0.5 // Subtle reflections
                 });
 
-                const material2 = new THREE.MeshStandardMaterial({
-                    color: 0x333333, // Example: dark gray for accents
-                    metalness: 0.5,
-                    roughness: 0.4,
+                const FerrariRed = new THREE.MeshStandardMaterial({
+                    color: 0xFF2800, // Ferrari Red (rosso corsa)
+                    metalness: 0.3, // Moderate metalness for painted metal
+                    roughness: 0.1, // Low roughness for glossy finish
                     envMap: environmentTexture,
-                    envMapIntensity: 1.0
+                    envMapIntensity: 1.0 // Strong reflections
                 });
 
                 // Override materials (adjust names based on your .mtl)
                 // Replace these with actual material names from Mono_optimized.mtl
-                materials.materials['CFRP'] = material1; // Example name
-                materials.materials['Powder_Coat_(Red)'] = material2; // Example name
+                materials.materials['CFRP'] = CFRP_Matt; // Example name
+                materials.materials['Powder_Coat_(Red)'] = FerrariRed; // Example name
 
                 const objLoader = new THREE.OBJLoader();
                 objLoader.setMaterials(materials);
