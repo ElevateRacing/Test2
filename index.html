@@ -108,7 +108,8 @@
         const modelsToLoad = [
             { obj: 'models/Mono_optimized.obj', mtl: 'models/Mono_optimized.mtl', materials: { 'CFRP': 'CFRP_Matt', 'Powder_Coat_(Red)': 'Paint_Red' } },
             { obj: 'models/Front_cover_optimized.obj', mtl: 'models/Front_cover_optimized.mtl', materials: { 'CFRP': 'CFRP_Matt', 'Powder_Coat_(Red)': 'Paint_Red' } },
-            { obj: 'models/Rear_cover_optimized.obj', mtl: 'models/Rear_cover_optimized.mtl', materials: { 'CFRP': 'CFRP_Matt', 'Powder_Coat_(Red)': 'Paint_Red' } }
+            { obj: 'models/Rear_cover_optimized.obj', mtl: 'models/Rear_cover_optimized.mtl', materials: { 'CFRP': 'CFRP_Matt', 'Powder_Coat_(Red)': 'Paint_Red' } },
+            { obj: 'models/Seat_optimized.obj', mtl: 'models/Seat_optimized.mtl', materials: { 'CFRP': 'CFRP_Matt', 'Powder_Coat_(Red)': 'Paint_Red' } }
         ];
 
         // Load HDR and initialize materials, then load models
@@ -123,7 +124,7 @@
 
                 // Define materials after HDR is loaded
                 Paint_Red = new THREE.MeshStandardMaterial({
-                    color: 0xFF2501, // Fiery sporty red
+                    color: 0xFF0501, // Fiery sporty red
                     metalness: 0.3,
                     roughness: 0.1,
                     envMap: environmentTexture,
