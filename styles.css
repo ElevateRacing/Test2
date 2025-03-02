@@ -56,6 +56,7 @@ html, body {
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
     transition: background-color 0.3s ease;
+    position: relative;
 }
 
 #header-box:hover {
@@ -73,8 +74,6 @@ html, body {
     left: 50%;
     transform: translateX(-50%);
     padding: 10px;
-    top: 50%; /* Vertically center within #header-box */
-    transform: translate(-50%, -50%); /* Center both horizontally and vertically */
 }
 
 #header-buttons {
@@ -85,7 +84,7 @@ html, body {
 
 .header-button {
     font-family: 'FORMULA1-BOLD', sans-serif;
-    font-size: 14px;
+    font-size: 12px;
     padding: 10px 20px;
     background-color: #404040;
     color: #ffffff;
@@ -110,14 +109,14 @@ html, body {
 .line1 {
     display: block;
     font-family: 'FORMULA1-WIDE', sans-serif;
-    font-size: 40px;
+    font-size: 45px;
     color: #C00000;
 }
 
 .line2 {
     display: block;
     margin-top: 5px;
-    font-family: "Arial Black", Arial, sans-serif;
+    font-family: 'FORMULA1-BOLD', sans-serif;
     font-size: 30px;
     color: #404040;
 }
@@ -130,13 +129,13 @@ html, body {
 #left-text .regular {
     font-family: 'FORMULA1-REGULAR', sans-serif;
     color: #595959;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 #left-text .bold {
     font-family: 'FORMULA1-BOLD', sans-serif;
     color: #404040;
-    font-size: 18px;
+    font-size: 16px;
 }
 
 #left-text .separator {
