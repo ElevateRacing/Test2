@@ -109,12 +109,13 @@ html, body {
     display: block;
     font-family: 'FORMULA1-WIDE', sans-serif;
     font-size: 40px;
-    color: #DF4949;
+    color: #C00000;
 }
 
 .line2 {
     display: block;
-    font-family: 'FORMULA1-BOLD', sans-serif;
+    margin-top: 5px;
+    font-family: 'FORMULA1-REGULAR', sans-serif;
     font-size: 30px;
     color: #404040;
 }
@@ -122,8 +123,30 @@ html, body {
 #left-text {
     grid-area: left-text;
     padding: 20px;
-    font-size: 18px;
+}
+
+#left-text .regular {
+    font-family: 'FORMULA1-REGULAR', sans-serif;
     color: #595959;
+    font-size: 16px;
+}
+
+#left-text .bold {
+    font-family: 'FORMULA1-BOLD', sans-serif;
+    color: #404040;
+    font-size: 18px;
+}
+
+#left-text .separator {
+    border: 0;
+    height: 2px;
+    background: #D0CECE;
+    width: 150px;
+    margin: 50px 0;
+}
+
+#left-text .spacer {
+    height: 20px;
 }
 
 #canvas-container {
