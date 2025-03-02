@@ -101,6 +101,48 @@
         camera.position.set(0, 0, 5);
         camera.lookAt(0, 0, 0);
 
+        // Text Setup (assuming MyFont.json is in your project folder)
+        const fontLoader = new THREE.FontLoader();
+        fontLoader.load('Formula1 Display Bold.json', function (font) {
+            const textGeometry = new THREE.TextGeometry('Elevate Racing', {
+                font: font,
+                size: 0.2,
+                height: 0.05,
+                curveSegments: 12,
+                bevelEnabled: false
+            });
+            const textMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 }); // Black text
+            const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+
+            // Center the text
+            textGeometry.computeBoundingBox();
+            const textWidth = textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x;
+            textMesh.position.set(-textWidth / 2, -1.5, 0); // Bottom of scene
+
+            // Semi-transparent background plane
+            const planeGeometry = new THREE.PlaneGeometry(textWidth + 0.4, 0.4); // Slightly larger than text
+            const planeMaterial = new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.5,
+                side: THREE.DoubleSide
+            });
+            const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+            plane.position.set(0, -1.5, -0.01); // Slightly behind text
+
+            // Round edges simulated with border-radius-like effect (optional shader needed for true rounding)
+            scene.add(plane);
+            scene.add(textMesh);
+
+            // Make text and plane always face camera
+            function updateTextOrientation() {
+                textMesh.lookAt(camera.position);
+                plane.lookAt(camera.position);
+            }
+            updateTextOrientation();
+            scene.addEventListener('update', updateTextOrientation); // Custom update loop
+        });
+
         
 
         
@@ -119,7 +161,8 @@
         // Animation loop
         function animate() {
             requestAnimationFrame(animate);
-            scene.rotation.y += 0.005; // Rotate the entire scene slowly
+            cube.rotation.x += 0.01; // Rotate cube
+            cube.rotation.y += 0.01;
             renderer.render(scene, camera);
         }
         animate();
