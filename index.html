@@ -106,7 +106,7 @@
 
         // List of models to load with material mappings
         const modelsToLoad = [
-            { obj: 'models/Mono_optimized3.obj', mtl: 'models/Mono_optimized3.mtl', materials: { 'CFRP': 'CFRP_Matt', 'Powder_Coat_(Red)': 'Paint_Red' } }
+            { obj: 'models/Mono_optimized.obj', mtl: 'models/Mono_optimized.mtl', materials: { 'CFRP': 'CFRP_Matt', 'Powder_Coat_(Red)': 'Paint_Red' } }
         ];
 
         // Load HDR and initialize materials, then load models
@@ -198,7 +198,7 @@
                         modelInfo.obj,
                         function (object) {
                             object.position.set(0, 0, 0);
-                            object.scale.set(0.0005, 0.0005, 0.0005);
+                            object.scale.set(0.0002, 0.0002, 0.0002);
                             scene.add(object);
                             console.log(`${modelInfo.obj} added to scene with HDR materials`);
 
