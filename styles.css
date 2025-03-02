@@ -65,13 +65,14 @@ html, body {
 #logo-left {
     padding: 10px;
     min-width: 0;
+    flex-shrink: 0;
 }
 
 #logo-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%); /* Center horizontally */
     padding: 10px;
+    flex-grow: 1; /* Allows it to take available space and center */
+    display: flex;
+    justify-content: center; /* Centers the logo within its flex space */
     flex-shrink: 0;
 }
 
@@ -115,7 +116,7 @@ html, body {
 .line2 {
     display: block;
     margin-top: 5px;
-    font-family: 'FORMULA1-REGULAR', sans-serif;
+    font-family: "Arial Black", Arial, sans-serif;
     font-size: 30px;
     color: #404040;
 }
