@@ -161,8 +161,26 @@ html, body {
 #right-text {
     grid-area: right-text;
     padding: 20px;
-    font-size: 18px;
+}
+
+#right-text .regular {
+    font-family: 'FORMULA1-REGULAR', sans-serif;
     color: #595959;
+    font-size: 14px;
+}
+
+#right-text .bold {
+    font-family: 'FORMULA1-BOLD', sans-serif;
+    color: #404040;
+    font-size: 16px;
+}
+
+#right-text .separator {
+    border: 0;
+    height: 2px;
+    background: #D0CECE;
+    width: 150px;
+    margin: 50px 0;
 }
 
 #bottom-text {
@@ -182,4 +200,11 @@ html, body {
     font-family: 'FORMULA1-REGULAR', sans-serif;
     font-size: 10px;
     color: #C00000;
+}
+
+.bottom_line2 {
+    display: block;
+    font-family: 'FORMULA1-REGULAR', sans-serif;
+    font-size: 20px;
+    color: #404040;
 }
