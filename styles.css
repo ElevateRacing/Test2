@@ -116,7 +116,7 @@ html, body {
 .line2 {
     display: block;
     margin-top: 5px;
-    font-family: 'FORMULA1-REGULAR', sans-serif;
+    font-family: 'FORMULA1-WIDE', sans-serif;
     font-size: 20px;
     color: #404040;
 }
@@ -156,6 +156,9 @@ html, body {
     height: 100%;
     min-height: 200px;
     box-sizing: border-box;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.1); /* Matches #header-box shadow */
+    border-radius: 15px; /* Matches #header-box rounded edges */
+    overflow: hidden; /* Ensures canvas content respects rounded edges */
 }
 
 #right-text {
