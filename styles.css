@@ -69,11 +69,12 @@ html, body {
 }
 
 #logo-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     padding: 10px;
-    flex-grow: 1; /* Allows it to take available space and center */
-    display: flex;
-    justify-content: center; /* Centers the logo within its flex space */
-    flex-shrink: 0;
+    top: 50%; /* Vertically center within #header-box */
+    transform: translate(-50%, -50%); /* Center both horizontally and vertically */
 }
 
 #header-buttons {
@@ -175,4 +176,11 @@ html, body {
     bottom: 0;
     background-color: #ffffff;
     z-index: 5;
+}
+
+.line1 {
+    display: block;
+    font-family: 'FORMULA1-REGULAR', sans-serif;
+    font-size: 10px;
+    color: #C00000;
 }
