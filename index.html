@@ -10,7 +10,7 @@
     <div id="grid-container">
         <div id="header-box">
             <div id="logo">
-                <img src="logo.png" alt="Logo" style="max-height: 55px;">
+                <img src="logo.png" alt="Logo" style="max-height: 70px;">
             </div>
             <div id="header-buttons">
                 <a href="buy.html"><button class="header-button">Reserve your Air Kart</button></a>
@@ -18,40 +18,77 @@
             </div>
         </div>
         <div id="top-text">
-            <span class="line1">Air kart</span>
-            <span class="line2">Enter the new dimension: go-kart racing, elevated.</span>
+            <span class="first-word">Air Kart</span> <span class="rest-words"> - Probably* the coolest kart you can fly</span>
         </div>
         <div id="left-text">
-            <p>Line 1 on the left</p>
-            <p>Line 2 on the left</p>
+            <div><span class="regular">Mass of kart </span> <span class="bold">150kg</span></div>
+            <div><span class="regular">and pilot </span> <span class="bold">100kg MAX</span></div>
+            <div><span class="regular">Flight time </span> <span class="bold">15min</span></div>
+            <hr class="separator">
+            <div><span class="regular">8x Electric motors </span> <span class="bold">130hp</span></div>
+            <div><span class="regular">8x Battery </span> <span class="bold">100V/21Ah</span></div>
+            <hr class="separator">
+            <div class="spacer"></div>
+            <div class="spacer"></div>
+            <div><span class="regular">Estimated purchase price:</span> <span class="bold">$199,000</span></div>
         </div>
         <div id="canvas-container"></div>
         <div id="right-text">
-            <p>Line 1 on the right</p>
-            <p>Line 2 on the right</p>
+            <div><span class="bold">CFRP</span> <span class="regular"> monocoque construction</span></div>
+            <div><span class="regular">designed for </span> <span class="bold">pilots safety</span></div>
+            <hr class="separator">
+            <div><span class="regular">Components made from </span></div>
+            <div><span class="bold">environmental friendly</span> <span class="regular"> flax fibre</span></div>
+            <hr class="separator">
+            <div><span class="regular">Ducted propeller for </span> <span class="bold">increased</span></div>
+            <div><span class="bold">efficiency</span> <span class="regular"> and </span> <span class="bold">noise reduction</span></div>
         </div>
-        <div id="bottom-text">Bottom text</div>
+        <div id="bottom-text">*Disclaimer - we know it’s the coolest kart</div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/FontLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/geometries/TextGeometry.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/OBJLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/MTLLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/controls/TrackballControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/RGBELoader.js"></script>
     <script>
         // Scene, camera, and renderer setup
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-        renderer.setClearColor(0xd3d3d3, 1);
+        const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000); // Aspect will be updated in resizeRenderer
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setClearColor(0xffffff, 1);
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 0.9;
         renderer.physicallyCorrectLights = true;
 
         const container = document.getElementById('canvas-container');
+        const gridContainer = document.getElementById('grid-container');
+        const leftText = document.getElementById('left-text');
+        const rightText = document.getElementById('right-text');
+        const topText = document.getElementById('top-text');
+        const bottomText = document.getElementById('bottom-text');
+        const logo = document.getElementById('logo');
+
         if (!container) {
-            console.error('Canvas container not found!');
+            console.error('Canvas container not found! Add <div id="canvas-container"></div> to your HTML.');
         } else {
             renderer.setSize(container.clientWidth, container.clientHeight);
             container.appendChild(renderer.domElement);
         }
+
+        // Load HDRI environment map
+        const rgbeLoader = new THREE.RGBELoader();
+        rgbeLoader.load(
+            'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/autumn_field_1k.hdr',
+            function (texture) {
+                texture.mapping = THREE.EquirectangularReflectionMapping;
+                scene.environment = texture;
+                console.log('HDRI environment loaded successfully!');
+            },
+            undefined,
+            function (error) {
+                console.error('Error loading HDRI:', error);
+            }
+        );
 
         // Add ambient lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 2.0);
@@ -74,118 +111,176 @@
         pointLight.position.set(0, 5, 5);
         scene.add(pointLight);
 
-        // Rotating Cube
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-        const cube = new THREE.Mesh(geometry, material);
-        cube.position.set(0, 0, 0);
-        scene.add(cube);
+        // Function to load a model with MTL and OBJ
+        function loadModel(mtlPath, objPath, position = {x: 0, y: 0, z: 0}) {
+            return new Promise((resolve, reject) => {
+                const mtlLoader = new THREE.MTLLoader();
+                mtlLoader.load(
+                    mtlPath,
+                    function (materials) {
+                        materials.preload();
+                        const objLoader = new THREE.OBJLoader();
+                        objLoader.setMaterials(materials);
+                        objLoader.load(
+                            objPath,
+                            function (object) {
+                                object.position.set(position.x, position.y, position.z);
+                                object.scale.set(0.004, 0.004, 0.004);
+                                console.log(`Successfully loaded ${objPath}`);
+                                resolve(object);
+                            },
+                            function (xhr) {
+                                console.log(`${objPath}: ${(xhr.loaded / xhr.total * 100)}% loaded`);
+                            },
+                            function (error) {
+                                console.error(`Error loading ${objPath}:`, error);
+                                reject(error);
+                            }
+                        );
+                    },
+                    undefined,
+                    function (error) {
+                        console.error(`Error loading ${mtlPath}:`, error);
+                        reject(error);
+                    }
+                );
+            });
+        }
 
-        // Camera position
-        camera.position.set(0, 0, 5);
-        camera.lookAt(0, 0, 0);
+        // Initial parts to load
+        const initialParts = [
+            { mtl: 'models/Mono.mtl', obj: 'models/Mono.obj' },
+            { mtl: 'models/Front_cover.mtl', obj: 'models/Front_cover.obj' },
+            { mtl: 'models/Rear_cover.mtl', obj: 'models/Rear_cover.obj' },
+            { mtl: 'models/Seat.mtl', obj: 'models/Seat.obj' },
+            { mtl: 'models/Roll_hoop.mtl', obj: 'models/Roll_hoop.obj' },
+            { mtl: 'models/Roll_hoop_cover.mtl', obj: 'models/Roll_hoop_cover.obj' },
+            { mtl: 'models/Side_cover_top_l.mtl', obj: 'models/Side_cover_top_l.obj' },
+            { mtl: 'models/Side_cover_r.mtl', obj: 'models/Side_cover_r.obj' },
+            { mtl: 'models/Side_cover_bottom_l.mtl', obj: 'models/Side_cover_bottom_l.obj' },
+            { mtl: 'models/Seat_belts.mtl', obj: 'models/Seat_belts.obj' },
+        ];
 
-        // Text Setup
-        let textMesh, plane;
-        const fontLoader = new THREE.FontLoader();
-        fontLoader.load(
-            'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', // Standard font
-            function (font) {
-                console.log('Font loaded successfully:', font);
-                const textGeometry = new THREE.TextGeometry('Elevate Racing', {
-                    font: font,
-                    size: 0.15, // Reduced size to fit better
-                    height: 0.05,
-                    curveSegments: 12,
-                    bevelEnabled: false
-                });
-                const textMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
-                textMesh = new THREE.Mesh(textGeometry, textMaterial);
+        // Remaining parts to load
+        const remainingParts = [
+            { mtl: 'models/Canopy_edge.mtl', obj: 'models/Canopy_edge.obj' },
+            { mtl: 'models/Joystick.mtl', obj: 'models/Joystick.obj' },
+            { mtl: 'models/Throttle.mtl', obj: 'models/Throttle.obj' },
+            { mtl: 'models/Display.mtl', obj: 'models/Display.obj' },
+            { mtl: 'models/Skids.mtl', obj: 'models/Skids.obj' },
+            { mtl: 'models/Arm_fwd.mtl', obj: 'models/Arm_fwd.obj' },
+            { mtl: 'models/Arm_aft.mtl', obj: 'models/Arm_aft.obj' },
+            { mtl: 'models/Motor_support_fwd.mtl', obj: 'models/Motor_support_fwd.obj' },
+            { mtl: 'models/Motor_support_Aft.mtl', obj: 'models/Motor_support_Aft.obj' },
+            { mtl: 'models/Motors_fwd.mtl', obj: 'models/Motors_fwd.obj' },
+            { mtl: 'models/Motors_aft.mtl', obj: 'models/Motors_aft.obj' },
+            { mtl: 'models/Propellers_fwd.mtl', obj: 'models/Propellers_fwd.obj' },
+            { mtl: 'models/Propeller_aft.mtl', obj: 'models/Propeller_aft.obj' },
+            { mtl: 'models/Propeller_plate_fwd.mtl', obj: 'models/Propeller_plate_fwd.obj' },
+            { mtl: 'models/Propeller_plate_aft.mtl', obj: 'models/Propeller_plate_aft.obj' },
+            { mtl: 'models/Support_duct_fwd.mtl', obj: 'models/Support_duct_fwd.obj' },
+            { mtl: 'models/Support_duct_aft.mtl', obj: 'models/Support_duct_aft.obj' },
+            { mtl: 'models/Duct_holder_fwd.mtl', obj: 'models/Duct_holder_fwd.obj' },
+            { mtl: 'models/Duct_holder_aft.mtl', obj: 'models/Duct_holder_aft.obj' },
+            { mtl: 'models/Ducts_top_fwd.mtl', obj: 'models/Ducts_top_fwd.obj' },
+            { mtl: 'models/Ducts_top_aft.mtl', obj: 'models/Ducts_top_aft.obj' },
+            { mtl: 'models/Ducts_bottom_fwd.mtl', obj: 'models/Ducts_bottom_fwd.obj' },
+            { mtl: 'models/Ducts_bottom_aft.mtl', obj: 'models/Ducts_bottom_aft.obj' },
+        ];
 
-                // Center the text
-                textGeometry.computeBoundingBox();
-                const textWidth = textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x;
-                const textHeight = textGeometry.boundingBox.max.y - textGeometry.boundingBox.min.y;
-                textMesh.position.set(-textWidth / 2, -1.5 - textHeight / 2, 0);
+        // Load initial parts
+        let objectBoundingBox = null;
+        let objectCenter = new THREE.Vector3();
+        initialParts.forEach(part => {
+            loadModel(part.mtl, part.obj, {x: 0, y: 0, z: 0}).then((object) => {
+                scene.add(object);
+                console.log(`${part.obj} added to scene`);
+                if (part.obj === 'models/Mono.obj') {
+                    objectBoundingBox = new THREE.Box3().setFromObject(object);
+                    objectCenter = objectBoundingBox.getCenter(new THREE.Vector3());
+                    camera.position.set(0, -1.5, 1.5);
+                    camera.lookAt(objectCenter);
+                }
+            }).catch((error) => {
+                console.error(`Failed to load ${part.obj}:`, error);
+            });
+        });
 
-                // Semi-transparent rounded background
-                const shape = new THREE.Shape();
-                const width = textWidth + 0.2; // Smaller padding
-                const height = textHeight + 0.2;
-                const radius = 0.05; // Smaller radius for tighter fit
-                shape.moveTo(-width / 2, -height / 2);
-                shape.lineTo(width / 2 - radius, -height / 2);
-                shape.quadraticCurveTo(width / 2, -height / 2, width / 2, -height / 2 + radius);
-                shape.lineTo(width / 2, height / 2 - radius);
-                shape.quadraticCurveTo(width / 2, height / 2, width / 2 - radius, height / 2);
-                shape.lineTo(-width / 2 + radius, height / 2);
-                shape.quadraticCurveTo(-width / 2, height / 2, -width / 2, height / 2 - radius);
-                shape.lineTo(-width / 2, -height / 2 + radius);
-                shape.quadraticCurveTo(-width / 2, -height / 2, -width / 2 + radius, -height / 2);
-
-                const planeGeometry = new THREE.ShapeGeometry(shape);
-                const planeMaterial = new THREE.MeshBasicMaterial({
-                    color: 0xffffff,
-                    transparent: true,
-                    opacity: 0.5,
-                    side: THREE.DoubleSide
-                });
-                plane = new THREE.Mesh(planeGeometry, planeMaterial);
-                plane.position.set(0, -1.5, -0.01);
-
-                scene.add(plane);
-                scene.add(textMesh);
-            },
-            function (xhr) {
-                console.log('Font loading progress:', (xhr.loaded / xhr.total * 100) + '%');
-            },
-            function (error) {
-                console.error('Error loading font:', error);
-                const fallbackGeometry = new THREE.BoxGeometry(1, 0.2, 0.1);
-                const fallbackMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-                textMesh = new THREE.Mesh(fallbackGeometry, fallbackMaterial);
-                textMesh.position.set(0, -1.5, 0);
-                scene.add(textMesh);
-
-                const planeGeometry = new THREE.PlaneGeometry(1.4, 0.4);
-                const planeMaterial = new THREE.MeshBasicMaterial({
-                    color: 0xffffff,
-                    transparent: true,
-                    opacity: 0.5,
-                    side: THREE.DoubleSide
-                });
-                plane = new THREE.Mesh(planeGeometry, planeMaterial);
-                plane.position.set(0, -1.5, -0.01);
-                scene.add(plane);
+        // Load remaining parts
+        Promise.all(remainingParts.map(part => 
+            loadModel(part.mtl, part.obj, {x: 0, y: 0, z: 0})
+                .catch(error => {
+                    console.error(`Failed to load ${part.obj}, skipping:`, error);
+                    return null;
+                })
+        )).then((loadedParts) => {
+            const validParts = loadedParts.filter(part => part !== null);
+            if (validParts.length > 0) {
+                validParts.forEach(part => scene.add(part));
+                console.log(`Added ${validParts.length} remaining parts to scene`);
+                objectBoundingBox = new THREE.Box3().setFromObject(scene);
+                objectCenter = objectBoundingBox.getCenter(new THREE.Vector3());
+            } else {
+                console.warn('No remaining parts were successfully loaded');
             }
-        );
+        }).catch((error) => {
+            console.error('Unexpected error in Promise.all:', error);
+        });
 
-        // Handle window resize
+        // Add TrackballControls
+        const controls = new THREE.TrackballControls(camera, renderer.domElement);
+        controls.rotateSpeed = 2.5;
+        controls.zoomSpeed = 5;
+        controls.panSpeed = 2;
+        controls.staticMoving = true;
+        controls.dynamicDampingFactor = 0.05;
+        controls.minDistance = 0.3;
+        controls.maxDistance = 2;
+
+        // Resize renderer
         function resizeRenderer() {
-            const width = container.clientWidth;
-            const height = container.clientHeight;
-            renderer.setSize(width, height);
-            camera.aspect = width / height;
+            if (!gridContainer || !container) return;
+            const totalWidth = gridContainer.clientWidth;
+            const leftWidth = leftText ? leftText.offsetWidth : 0;
+            const rightWidth = rightText ? rightText.offsetWidth : 0;
+            const canvasWidth = totalWidth - leftWidth - rightWidth;
+
+            renderer.setSize(canvasWidth, container.clientHeight);
+            camera.aspect = canvasWidth / container.clientHeight;
             camera.updateProjectionMatrix();
         }
-        window.addEventListener('resize', resizeRenderer);
         resizeRenderer();
+        window.addEventListener('resize', resizeRenderer);
+
+        // Mutation observer for dynamic resizing
+        const observer = new MutationObserver(resizeRenderer);
+        [logo, topText, leftText, rightText, bottomText].forEach(element => {
+            if (element) observer.observe(element, { childList: true, subtree: true, characterData: true });
+        });
+
+        // Rotation control
+        let isRotating = true;
+        renderer.domElement.addEventListener('mousedown', (event) => {
+            if (event.button === 0) isRotating = false;
+        });
+        renderer.domElement.addEventListener('touchstart', () => {
+            isRotating = false;
+        });
+        renderer.domElement.addEventListener('mouseup', () => {
+            isRotating = true;
+        });
+        renderer.domElement.addEventListener('touchend', () => {
+            isRotating = true;
+        });
 
         // Animation loop
         function animate() {
             requestAnimationFrame(animate);
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
-
-            // Update text and plane orientation (correct Y-axis rotation)
-            if (textMesh && plane) {
-                const cameraDirection = new THREE.Vector3();
-                camera.getWorldDirection(cameraDirection);
-                const angle = Math.atan2(-cameraDirection.x, -cameraDirection.z); // Flip direction
-                textMesh.rotation.set(0, angle, 0); // Flat, facing forward
-                plane.rotation.set(0, angle, 0);    // Match text
+            controls.update();
+            if (isRotating) {
+                scene.rotation.z += 0.003;
             }
-
+            renderer.clear();
             renderer.render(scene, camera);
         }
         animate();
