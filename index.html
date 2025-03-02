@@ -69,7 +69,7 @@
         const rightText = document.getElementById('right-text');
         const topText = document.getElementById('top-text');
         const bottomText = document.getElementById('bottom-text');
-        const logoLeft = document.getElementById('logo-left'); // Updated to logo-left
+        const logoLeft = document.getElementById('logo-left');
 
         if (!container) {
             console.error('Canvas container not found! Add <div id="canvas-container"></div> to your HTML.');
@@ -79,17 +79,21 @@
         }
 
         // Load HDRI environment map
+        let environmentTexture = null;
         const rgbeLoader = new THREE.RGBELoader();
         rgbeLoader.load(
             'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/autumn_field_1k.hdr',
             function (texture) {
                 texture.mapping = THREE.EquirectangularReflectionMapping;
                 scene.environment = texture;
+                environmentTexture = texture;
                 console.log('HDRI environment loaded successfully!');
+                loadAndApplyModel();
             },
             undefined,
             function (error) {
                 console.error('Error loading HDRI:', error);
+                loadAndApplyModel(); // Load model even if HDR fails
             }
         );
 
@@ -114,55 +118,61 @@
         pointLight.position.set(0, 5, 5);
         scene.add(pointLight);
 
-        // Function to load a model with MTL and OBJ
-        function loadModel(mtlPath, objPath, position = {x: 0, y: 0, z: 0}) {
-            return new Promise((resolve, reject) => {
-                const mtlLoader = new THREE.MTLLoader();
-                mtlLoader.load(
-                    mtlPath,
-                    function (materials) {
-                        materials.preload();
-                        const objLoader = new THREE.OBJLoader();
-                        objLoader.setMaterials(materials);
-                        objLoader.load(
-                            objPath,
-                            function (object) {
-                                object.position.set(position.x, position.y, position.z);
-                                object.scale.set(0.0005, 0.0005, 0.0005);
-                                console.log(`Successfully loaded ${objPath}`);
-                                resolve(object);
-                            },
-                            function (xhr) {
-                                console.log(`${objPath}: ${(xhr.loaded / xhr.total * 100)}% loaded`);
-                            },
-                            function (error) {
-                                console.error(`Error loading ${objPath}:`, error);
-                                reject(error);
-                            }
-                        );
+        // Function to load model and apply custom HDR materials
+        function loadAndApplyModel() {
+            const mtlLoader = new THREE.MTLLoader();
+            mtlLoader.load('models/Mono_optimized.mtl', function (materials) {
+                materials.preload();
+
+                // Define two custom HDR-enhanced PBR materials
+                const material1 = new THREE.MeshStandardMaterial({
+                    color: 0xaaaaaa, // Example: silver for body
+                    metalness: 0.8,
+                    roughness: 0.2,
+                    envMap: environmentTexture,
+                    envMapIntensity: 1.0
+                });
+
+                const material2 = new THREE.MeshStandardMaterial({
+                    color: 0x333333, // Example: dark gray for accents
+                    metalness: 0.5,
+                    roughness: 0.4,
+                    envMap: environmentTexture,
+                    envMapIntensity: 1.0
+                });
+
+                // Override materials (adjust names based on your .mtl)
+                // Replace these with actual material names from Mono_optimized.mtl
+                materials.materials['material_1'] = material1; // Example name
+                materials.materials['material_2'] = material2; // Example name
+
+                const objLoader = new THREE.OBJLoader();
+                objLoader.setMaterials(materials);
+                objLoader.load(
+                    'models/Mono_optimized.obj',
+                    function (object) {
+                        object.position.set(0, 0, 0);
+                        object.scale.set(0.0005, 0.0005, 0.0005);
+                        scene.add(object);
+                        console.log('Mono_optimized added to scene with HDR materials');
+
+                        // Set camera based on bounding box
+                        const objectBoundingBox = new THREE.Box3().setFromObject(object);
+                        const objectCenter = objectBoundingBox.getCenter(new THREE.Vector3());
+                        camera.position.set(0, -1.5, 1.5);
+                        camera.lookAt(objectCenter);
                     },
-                    undefined,
+                    function (xhr) {
+                        console.log(`Mono_optimized.obj: ${(xhr.loaded / xhr.total * 100)}% loaded`);
+                    },
                     function (error) {
-                        console.error(`Error loading ${mtlPath}:`, error);
-                        reject(error);
+                        console.error('Error loading Mono_optimized.obj:', error);
                     }
                 );
+            }, undefined, function (error) {
+                console.error('Error loading Mono_optimized.mtl:', error);
             });
         }
-
-        // Load only Mono_optimized model
-        let objectBoundingBox = null;
-        let objectCenter = new THREE.Vector3();
-        loadModel('models/Mono_optimized.mtl', 'models/Mono_optimized.obj', {x: 0, y: 0, z: 0}).then((object) => {
-            scene.add(object);
-            console.log('Mono_optimized added to scene');
-            objectBoundingBox = new THREE.Box3().setFromObject(object);
-            objectCenter = objectBoundingBox.getCenter(new THREE.Vector3());
-            camera.position.set(0, -1.5, 1.5);
-            camera.lookAt(objectCenter);
-        }).catch((error) => {
-            console.error('Failed to load Mono_optimized:', error);
-        });
 
         // Add TrackballControls
         const controls = new THREE.TrackballControls(camera, renderer.domElement);
