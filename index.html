@@ -34,12 +34,13 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/FontLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/geometries/TextGeometry.js"></script> <!-- Added TextGeometry -->
     <script>
         // Scene, camera, and renderer setup
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-        renderer.setClearColor(0xd3d3d3, 1); // Light gray background
+        renderer.setClearColor(0xd3d3d3, 1);
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 0.9;
         renderer.physicallyCorrectLights = true;
@@ -75,7 +76,7 @@
 
         // Rotating Cube
         const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 }); // Green cube
+        const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
         const cube = new THREE.Mesh(geometry, material);
         cube.position.set(0, 0, 0);
         scene.add(cube);
@@ -98,13 +99,13 @@
                     curveSegments: 12,
                     bevelEnabled: false
                 });
-                const textMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 }); // Black text
+                const textMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
                 textMesh = new THREE.Mesh(textGeometry, textMaterial);
 
                 // Center the text
                 textGeometry.computeBoundingBox();
                 const textWidth = textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x;
-                textMesh.position.set(-textWidth / 2, -1.5, 0); // Bottom of scene
+                textMesh.position.set(-textWidth / 2, -1.5, 0);
 
                 // Semi-transparent background plane
                 const planeGeometry = new THREE.PlaneGeometry(textWidth + 0.4, 0.4);
@@ -115,7 +116,7 @@
                     side: THREE.DoubleSide
                 });
                 plane = new THREE.Mesh(planeGeometry, planeMaterial);
-                plane.position.set(0, -1.5, -0.01); // Slightly behind text
+                plane.position.set(0, -1.5, -0.01);
 
                 scene.add(plane);
                 scene.add(textMesh);
@@ -125,7 +126,7 @@
             },
             function (error) {
                 console.error('Error loading font:', error);
-                // Fallback: Add a simple red box with text-like appearance
+                // Fallback: Red box
                 const fallbackGeometry = new THREE.BoxGeometry(1, 0.2, 0.1);
                 const fallbackMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
                 textMesh = new THREE.Mesh(fallbackGeometry, fallbackMaterial);
