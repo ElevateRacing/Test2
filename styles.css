@@ -66,6 +66,7 @@ html, body {
 }
 
 .header-button {
+    font-family: 'FORMULA1-REGULAR', sans-serif;
     font-size: 14px;
     padding: 10px 20px;
     background-color: #404040;
@@ -87,8 +88,19 @@ html, body {
     text-align: center;
     padding: 20px 0;
     font-family: 'FORMULA1-WIDE', sans-serif;
+    color: #DF4949;
+}
+
+.line1 {
+    font-family: 'FORMULA1-WIDE', sans-serif;
     font-size: 40px;
     color: #DF4949;
+}
+
+.line2 {
+    font-family: 'FORMULA1-BOLD', sans-serif;
+    font-size: 20px;
+    color: #404040;
 }
 
 #left-text {
