@@ -56,7 +56,7 @@
     <script>
         // Scene, camera, and renderer setup
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000); // Aspect will be updated in resizeRenderer
+        const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setClearColor(0xffffff, 1);
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -69,7 +69,7 @@
         const rightText = document.getElementById('right-text');
         const topText = document.getElementById('top-text');
         const bottomText = document.getElementById('bottom-text');
-        const logo = document.getElementById('logo');
+        const logoLeft = document.getElementById('logo-left'); // Updated to logo-left
 
         if (!container) {
             console.error('Canvas container not found! Add <div id="canvas-container"></div> to your HTML.');
@@ -150,84 +150,18 @@
             });
         }
 
-        // Initial parts to load
-        const initialParts = [
-            { mtl: 'models/Mono_optimized.mtl', obj: 'models/Mono_optimized.obj' },
-            { mtl: 'models/Front_cover.mtl', obj: 'models/Front_cover.obj' },
-            { mtl: 'models/Rear_cover.mtl', obj: 'models/Rear_cover.obj' },
-            { mtl: 'models/Seat.mtl', obj: 'models/Seat.obj' },
-            { mtl: 'models/Roll_hoop.mtl', obj: 'models/Roll_hoop.obj' },
-            { mtl: 'models/Roll_hoop_cover.mtl', obj: 'models/Roll_hoop_cover.obj' },
-            { mtl: 'models/Side_cover_top_l.mtl', obj: 'models/Side_cover_top_l.obj' },
-            { mtl: 'models/Side_cover_r.mtl', obj: 'models/Side_cover_r.obj' },
-            { mtl: 'models/Side_cover_bottom_l.mtl', obj: 'models/Side_cover_bottom_l.obj' },
-            { mtl: 'models/Seat_belts.mtl', obj: 'models/Seat_belts.obj' },
-        ];
-
-        // Remaining parts to load
-        const remainingParts = [
-            { mtl: 'models/Canopy_edge.mtl', obj: 'models/Canopy_edge.obj' },
-            { mtl: 'models/Joystick.mtl', obj: 'models/Joystick.obj' },
-            { mtl: 'models/Throttle.mtl', obj: 'models/Throttle.obj' },
-            { mtl: 'models/Display.mtl', obj: 'models/Display.obj' },
-            { mtl: 'models/Skids.mtl', obj: 'models/Skids.obj' },
-            { mtl: 'models/Arm_fwd.mtl', obj: 'models/Arm_fwd.obj' },
-            { mtl: 'models/Arm_aft.mtl', obj: 'models/Arm_aft.obj' },
-            { mtl: 'models/Motor_support_fwd.mtl', obj: 'models/Motor_support_fwd.obj' },
-            { mtl: 'models/Motor_support_Aft.mtl', obj: 'models/Motor_support_Aft.obj' },
-            { mtl: 'models/Motors_fwd.mtl', obj: 'models/Motors_fwd.obj' },
-            { mtl: 'models/Motors_aft.mtl', obj: 'models/Motors_aft.obj' },
-            { mtl: 'models/Propellers_fwd.mtl', obj: 'models/Propellers_fwd.obj' },
-            { mtl: 'models/Propeller_aft.mtl', obj: 'models/Propeller_aft.obj' },
-            { mtl: 'models/Propeller_plate_fwd.mtl', obj: 'models/Propeller_plate_fwd.obj' },
-            { mtl: 'models/Propeller_plate_aft.mtl', obj: 'models/Propeller_plate_aft.obj' },
-            { mtl: 'models/Support_duct_fwd.mtl', obj: 'models/Support_duct_fwd.obj' },
-            { mtl: 'models/Support_duct_aft.mtl', obj: 'models/Support_duct_aft.obj' },
-            { mtl: 'models/Duct_holder_fwd.mtl', obj: 'models/Duct_holder_fwd.obj' },
-            { mtl: 'models/Duct_holder_aft.mtl', obj: 'models/Duct_holder_aft.obj' },
-            { mtl: 'models/Ducts_top_fwd.mtl', obj: 'models/Ducts_top_fwd.obj' },
-            { mtl: 'models/Ducts_top_aft.mtl', obj: 'models/Ducts_top_aft.obj' },
-            { mtl: 'models/Ducts_bottom_fwd.mtl', obj: 'models/Ducts_bottom_fwd.obj' },
-            { mtl: 'models/Ducts_bottom_aft.mtl', obj: 'models/Ducts_bottom_aft.obj' },
-        ];
-
-        // Load initial parts
+        // Load only Mono_optimized model
         let objectBoundingBox = null;
         let objectCenter = new THREE.Vector3();
-        initialParts.forEach(part => {
-            loadModel(part.mtl, part.obj, {x: 0, y: 0, z: 0}).then((object) => {
-                scene.add(object);
-                console.log(`${part.obj} added to scene`);
-                if (part.obj === 'models/Mono.obj') {
-                    objectBoundingBox = new THREE.Box3().setFromObject(object);
-                    objectCenter = objectBoundingBox.getCenter(new THREE.Vector3());
-                    camera.position.set(0, -1.5, 1.5);
-                    camera.lookAt(objectCenter);
-                }
-            }).catch((error) => {
-                console.error(`Failed to load ${part.obj}:`, error);
-            });
-        });
-
-        // Load remaining parts
-        Promise.all(remainingParts.map(part => 
-            loadModel(part.mtl, part.obj, {x: 0, y: 0, z: 0})
-                .catch(error => {
-                    console.error(`Failed to load ${part.obj}, skipping:`, error);
-                    return null;
-                })
-        )).then((loadedParts) => {
-            const validParts = loadedParts.filter(part => part !== null);
-            if (validParts.length > 0) {
-                validParts.forEach(part => scene.add(part));
-                console.log(`Added ${validParts.length} remaining parts to scene`);
-                objectBoundingBox = new THREE.Box3().setFromObject(scene);
-                objectCenter = objectBoundingBox.getCenter(new THREE.Vector3());
-            } else {
-                console.warn('No remaining parts were successfully loaded');
-            }
+        loadModel('models/Mono_optimized.mtl', 'models/Mono_optimized.obj', {x: 0, y: 0, z: 0}).then((object) => {
+            scene.add(object);
+            console.log('Mono_optimized added to scene');
+            objectBoundingBox = new THREE.Box3().setFromObject(object);
+            objectCenter = objectBoundingBox.getCenter(new THREE.Vector3());
+            camera.position.set(0, -1.5, 1.5);
+            camera.lookAt(objectCenter);
         }).catch((error) => {
-            console.error('Unexpected error in Promise.all:', error);
+            console.error('Failed to load Mono_optimized:', error);
         });
 
         // Add TrackballControls
@@ -257,7 +191,7 @@
 
         // Mutation observer for dynamic resizing
         const observer = new MutationObserver(resizeRenderer);
-        [logo, topText, leftText, rightText, bottomText].forEach(element => {
+        [logoLeft, topText, leftText, rightText, bottomText].forEach(element => {
             if (element) observer.observe(element, { childList: true, subtree: true, characterData: true });
         });
 
