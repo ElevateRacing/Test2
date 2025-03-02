@@ -53,8 +53,6 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/MTLLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/controls/TrackballControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/loaders/RGBELoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/geometries/DecalGeometry.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js"></script>
     <script>
         // Scene, camera, and renderer setup
         const scene = new THREE.Scene();
@@ -120,122 +118,76 @@
         pointLight.position.set(0, 5, 5);
         scene.add(pointLight);
 
-        // Global variables for model and decal
-        let model = null;
-        let decal = null;
+        // Define custom HDR materials
+        const Paint_Red = new THREE.MeshStandardMaterial({
+            color: 0xC8102E,
+            metalness: 0.3,
+            roughness: 0.1,
+            envMap: environmentTexture,
+            envMapIntensity: 1.0
+        });
 
-        // Load model and apply materials
-        function loadAndApplyModel() {
-            const mtlLoader = new THREE.MTLLoader();
-            mtlLoader.load('models/Mono_optimized.mtl', function (materials) {
-                materials.preload();
+        const CFRP_Matt = new THREE.MeshStandardMaterial({
+            color: 0x1C2526,
+            metalness: 0.1,
+            roughness: 0.6,
+            envMap: environmentTexture,
+            envMapIntensity: 0.5
+        });
 
-                const CFRP_Matt = new THREE.MeshStandardMaterial({
-                    color: 0x1C2526,
-                    metalness: 0.1,
-                    roughness: 0.6,
-                    envMap: environmentTexture,
-                    envMapIntensity: 0.5
-                });
+        // List of models to load with material mappings
+        const modelsToLoad = [
+            { obj: 'models/Mono_optimized.obj', mtl: 'models/Mono_optimized.mtl', materials: { 'CFRP': CFRP_Matt, 'Powder_Coat_(Red)': Paint_Red } },
+            { obj: 'models/Front_cover_optimized.obj', mtl: 'models/Front_cover_optimized.mtl', materials: { 'CFRP': CFRP_Matt, 'Powder_Coat_(Red)': Paint_Red } },
+            { obj: 'models/Rear_cover_optimized.obj', mtl: 'models/Rear_cover_optimized.mtl', materials: { 'CFRP': CFRP_matt, 'Powder_Coat_(Red)': Paint_Red } }
+        ];
 
-                const FerrariRed = new THREE.MeshStandardMaterial({
-                    color: 0xFF2800,
-                    metalness: 0.3,
-                    roughness: 0.1,
-                    envMap: environmentTexture,
-                    envMapIntensity: 1.0
-                });
 
-                // Replace with actual material names from Mono_optimized.mtl
-                materials.materials['CFRP'] = CFRP_Matt;
-                materials.materials['Powder_Coat_(Red)'] = FerrariRed;
 
-                const objLoader = new THREE.OBJLoader();
-                objLoader.setMaterials(materials);
-                objLoader.load(
-                    'models/Mono_optimized.obj',
-                    function (object) {
-                        object.position.set(0, 0, 0);
-                        object.scale.set(0.0005, 0.0005, 0.0005);
-                        scene.add(object);
-                        model = object; // Assign to global model variable
-                        console.log('Mono_optimized added to scene with HDR materials');
+        // Load models
+        function loadModels() {
+            modelsToLoad.forEach(modelInfo => {
+                const mtlLoader = new THREE.MTLLoader();
+                mtlLoader.load(modelInfo.mtl, function (materials) {
+                    materials.preload();
 
-                        // Set camera based on bounding box
-                        const objectBoundingBox = new THREE.Box3().setFromObject(object);
-                        const objectCenter = objectBoundingBox.getCenter(new THREE.Vector3());
-                        camera.position.set(0, -1.5, 1.5);
-                        camera.lookAt(objectCenter);
-
-                        // Add decal after model loads
-                        addDecal();
-                    },
-                    function (xhr) {
-                        console.log(`Mono_optimized.obj: ${(xhr.loaded / xhr.total * 100)}% loaded`);
-                    },
-                    function (error) {
-                        console.error('Error loading Mono_optimized.obj:', error);
+                    // Override materials with custom HDR versions
+                    for (const [mtlName, newMaterial] of Object.entries(modelInfo.materials)) {
+                        if (materials.materials[mtlName]) {
+                            materials.materials[mtlName] = newMaterial;
+                        } else {
+                            console.warn(`Material ${mtlName} not found in ${modelInfo.mtl}`);
+                        }
                     }
-                );
-            }, undefined, function (error) {
-                console.error('Error loading Mono_optimized.mtl:', error);
-            });
-        }
 
-        // Add decal with interactive GUI
-        function addDecal() {
-            if (!model) {
-                console.error('Model not loaded yet, cannot add decal.');
-                return;
-            }
+                    const objLoader = new THREE.OBJLoader();
+                    objLoader.setMaterials(materials);
+                    objLoader.load(
+                        modelInfo.obj,
+                        function (object) {
+                            object.position.set(0, 0, 0);
+                            object.scale.set(0.0005, 0.0005, 0.0005);
+                            scene.add(object);
+                            console.log(`${modelInfo.obj} added to scene with HDR materials`);
 
-            const textureLoader = new THREE.TextureLoader();
-            textureLoader.load('55.png', function (texture) {
-                const decalMaterial = new THREE.MeshPhongMaterial({
-                    map: texture,
-                    transparent: true,
-                    depthTest: true,
-                    depthWrite: false,
-                    polygonOffset: true,
-                    polygonOffsetFactor: -4
-                });
-
-                // Decal parameters (adjustable via GUI)
-                const decalParams = {
-                    positionX: 0,
-                    positionY: 0,
-                    positionZ: 0,
-                    rotationX: 0,
-                    rotationY: 0,
-                    rotationZ: 0,
-                    scale: 0.1
-                };
-
-                function updateDecal() {
-                    if (decal) scene.remove(decal);
-                    const position = new THREE.Vector3(decalParams.positionX, decalParams.positionY, decalParams.positionZ);
-                    const rotation = new THREE.Euler(decalParams.rotationX, decalParams.rotationY, decalParams.rotationZ);
-                    const size = new THREE.Vector3(decalParams.scale, decalParams.scale, decalParams.scale);
-                    decal = new THREE.Mesh(
-                        new THREE.DecalGeometry(model, position, rotation, size),
-                        decalMaterial
+                            // Set camera based on the first model’s bounding box (or adjust as needed)
+                            if (modelInfo.obj === 'models/Mono_optimized.obj') {
+                                const objectBoundingBox = new THREE.Box3().setFromObject(object);
+                                const objectCenter = objectBoundingBox.getCenter(new THREE.Vector3());
+                                camera.position.set(0, 0, 0);
+                                camera.lookAt(objectCenter);
+                            }
+                        },
+                        function (xhr) {
+                            console.log(`${modelInfo.obj}: ${(xhr.loaded / xhr.total * 100)}% loaded`);
+                        },
+                        function (error) {
+                            console.error(`Error loading ${modelInfo.obj}:`, error);
+                        }
                     );
-                    scene.add(decal);
-                }
-
-                // Add GUI for interactive adjustment
-                const gui = new dat.GUI();
-                gui.add(decalParams, 'positionX', -1, 1, 0.01).name('Pos X').onChange(updateDecal);
-                gui.add(decalParams, 'positionY', -1, 1, 0.01).name('Pos Y').onChange(updateDecal);
-                gui.add(decalParams, 'positionZ', -1, 1, 0.01).name('Pos Z').onChange(updateDecal);
-                gui.add(decalParams, 'rotationX', -Math.PI, Math.PI, 0.01).name('Rot X').onChange(updateDecal);
-                gui.add(decalParams, 'rotationY', -Math.PI, Math.PI, 0.01).name('Rot Y').onChange(updateDecal);
-                gui.add(decalParams, 'rotationZ', -Math.PI, Math.PI, 0.01).name('Rot Z').onChange(updateDecal);
-                gui.add(decalParams, 'scale', 0.01, 0.5, 0.01).name('Scale').onChange(updateDecal);
-
-                updateDecal(); // Initial decal placement
-            }, undefined, function (error) {
-                console.error('Error loading 55.png:', error);
+                }, undefined, function (error) {
+                    console.error(`Error loading ${modelInfo.mtl}:`, error);
+                });
             });
         }
 
