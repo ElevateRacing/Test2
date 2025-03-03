@@ -102,6 +102,7 @@
         // Global variables
         let environmentTexture = null;
         let Paint_Red = null;
+        let Paint_Black = null;
         let CFRP_Matt = null;
         let Blue_Fabric = null; // Blue fabric for safety belts
         let Brushed_Stainless = null; // Brushed stainless steel
@@ -140,10 +141,10 @@
             { obj: 'models/Motors_fwd_2_optimized.obj', mtl: 'models/Motors_fwd_2_optimized.mtl', materials: { 'Black_Aluminium_Semi-gloss': 'Black_SemiGloss_Aluminium', 'Aluminum_-_Polished': 'Glossy_Aluminium' } },
             { obj: 'models/Motors_aft_1_optimized.obj', mtl: 'models/Motors_aft_1_optimized.mtl', materials: { 'Black_Aluminium_Semi-gloss': 'Black_SemiGloss_Aluminium', 'Aluminum_-_Polished': 'Glossy_Aluminium' } },
             { obj: 'models/Motors_aft_2_optimized.obj', mtl: 'models/Motors_aft_2_optimized.mtl', materials: { 'Black_Aluminium_Semi-gloss': 'Black_SemiGloss_Aluminium', 'Aluminum_-_Polished': 'Glossy_Aluminium' } },
-            { obj: 'models/Prop_fwd_top_1_optimized.obj', mtl: 'models/Prop_fwd_top_1_optimized.mtl', materials: { 'CFRP': 'Paint_Red' } },
-            { obj: 'models/Prop_fwd_top_2_optimized.obj', mtl: 'models/Prop_fwd_top_2_optimized.mtl', materials: { 'CFRP': 'Paint_Red' } },
-            { obj: 'models/Prop_fwd_bottom_1_optimized.obj', mtl: 'models/Prop_fwd_bottom_1_optimized.mtl', materials: { 'CFRP': 'Paint_Red' } },
-            { obj: 'models/Prop_fwd_bottom_2_optimized.obj', mtl: 'models/Prop_fwd_bottom_2_optimized.mtl', materials: { 'CFRP': 'Paint_Red' } }
+            { obj: 'models/Prop_fwd_top_1_optimized.obj', mtl: 'models/Prop_fwd_top_1_optimized.mtl', materials: { 'CFRP': 'Paint_Black' } },
+            { obj: 'models/Prop_fwd_top_2_optimized.obj', mtl: 'models/Prop_fwd_top_2_optimized.mtl', materials: { 'CFRP': 'Paint_Black' } },
+            { obj: 'models/Prop_fwd_bottom_1_optimized.obj', mtl: 'models/Prop_fwd_bottom_1_optimized.mtl', materials: { 'CFRP': 'Paint_Black' } },
+            { obj: 'models/Prop_fwd_bottom_2_optimized.obj', mtl: 'models/Prop_fwd_bottom_2_optimized.mtl', materials: { 'CFRP': 'Paint_Black' } }
         ];
 
         // Load HDR and initialize materials, then load models
@@ -159,6 +160,14 @@
                 // Define materials after HDR is loaded
                 Paint_Red = new THREE.MeshStandardMaterial({
                     color: 0xFF0501, // Fiery sporty red
+                    metalness: 0.3,
+                    roughness: 0.1,
+                    envMap: environmentTexture,
+                    envMapIntensity: 1.0
+                });
+
+                Paint_Black = new THREE.MeshStandardMaterial({
+                    color: 0x1C2526,
                     metalness: 0.3,
                     roughness: 0.1,
                     envMap: environmentTexture,
