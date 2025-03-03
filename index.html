@@ -109,6 +109,11 @@
         let Plastic_Grey = null; // Plastic grey
         let Plastic_Black = null; // Plastic black
         let Plastic_Red = null; // Plastic red
+        let Glossy_Aluminium = null;
+        let Black_SemiGloss_Aluminium = null;
+
+
+        
 
         // List of models to load with material mappings
         const modelsToLoad = [
@@ -129,7 +134,9 @@
             { obj: 'models/Joystick_optimized.obj', mtl: 'models/Joystick_optimized.mtl', materials: { 'Plastic_Black': 'Plastic_Black', 'Plastic_Red': 'Plastic_Red' } },
             { obj: 'models/Throttle_optimized.obj', mtl: 'models/Throttle_optimized.mtl', materials: { 'Plastic_Black': 'Plastic_Black', 'Steel_-_Satin': 'Brushed_Stainless' } },
             { obj: 'models/Arm_fwd_optimized.obj', mtl: 'models/Arm_fwd_optimized.mtl', materials: { 'CFRP': 'CFRP_Matt' } },
-            { obj: 'models/test.obj', mtl: 'models/test.mtl', materials: { 'CFRP': 'CFRP_Matt' } }
+            { obj: 'models/test.obj', mtl: 'models/test.mtl', materials: { 'CFRP': 'CFRP_Matt' } },
+            { obj: 'models/Motors_fwd_1_optimized.obj', mtl: 'models/Motors_fwd_1_optimized.mtl', materials: { 'Black_Aluminium_Semi-gloss': 'Black_SemiGloss_Aluminium', 'Aluminum_-_Polished': 'Glossy_Aluminium' } },
+            { obj: 'models/Motors_fwd_2_optimized.obj', mtl: 'models/Motors_fwd_2_optimized.mtl', materials: { 'Black_Aluminium_Semi-gloss': 'Black_SemiGloss_Aluminium', 'Aluminum_-_Polished': 'Glossy_Aluminium' } }
         ];
 
         // Load HDR and initialize materials, then load models
@@ -205,6 +212,20 @@
                     roughness: 0.5, // Semi-glossy plastic
                     envMap: environmentTexture,
                     envMapIntensity: 0.4 // Moderate reflections
+                });
+
+                Glossy_Aluminium = new THREE.MeshStandardMaterial({
+                    color: 0xD9D9D9,
+                    metalness: 0.9,
+                    roughness: 0.2,
+                    envMapIntensity: 1.2
+                });
+
+                Black_SemiGloss_Aluminium = new THREE.MeshStandardMaterial({
+                    color: 0x1F2525,
+                    metalness: 0.4,
+                    roughness: 0.4,
+                    envMapIntensity: 0.6
                 });
 
                 loadModels(); // Start loading models
